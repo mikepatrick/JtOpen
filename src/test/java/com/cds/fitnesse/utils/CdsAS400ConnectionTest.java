@@ -23,18 +23,27 @@ public class CdsAS400ConnectionTest extends TestCase{
     {
         return new TestSuite( CdsAS400ConnectionTest.class );
     }    
+    /** When a valid connection properties file is available,
+     * verify the object is created and contains non-null properties.
+     */
     public void testCdsAS400ConnectionOk()
     {
     	CdsAS400Connection con = new CdsAS400Connection("C:/users/mpatrick/db.properties");
     	assertNotNull(con);
     	assertEquals("username", "MPATRICK", con.getUser());
     }
+    /** When a valid connection properties file is not found,
+     * verify that null is returned.
+     */
     public void testCdsAS400ConnectionFileNotFound()
     {
     	CdsAS400Connection con = new CdsAS400Connection("db9.properties");
     	// There should be something better than the '==' operator here
     	assert(con == null);
     }    
+    /** Changing user name to the empty string is not allowed.
+     * Note that setters return the 
+     */
     public void testUser()
     {
     	CdsAS400Connection con = new CdsAS400Connection("c:/users/mpatrick/db.properties");

@@ -96,8 +96,27 @@ public class CmdCallFixture extends DoFixture {
 		}
 		this.dbConn.setUser(userName);
 		this.dbConn.setPassword(password);
-		
-		
+		dbConn = new CdsAS400Connection(dbFile);
+		try {
+			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return "Obtaining Connection failed @ getJDBCConnection()";
+		}
+		AS400 serv = null;
+		try {
+			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "Could not create AS400 object @ getAS400() - IOException";
+		} catch (AS400SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "Could not create AS400 object @ GETas400() - AS400SecurityException";
+		}				
+		return "Credentials changed";
 	}
 
 }
