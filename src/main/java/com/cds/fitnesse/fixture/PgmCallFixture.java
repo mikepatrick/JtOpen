@@ -43,11 +43,7 @@ public class PgmCallFixture extends DoFixture {
 
 	
 	public String runpgm(String command) throws Exception  {
-	/*	dbProperties = getDbProperties();
-		driverName = dbProperties.getProperty("database.driver");
-		dataSource = dbProperties.getProperty("database.url");
-		userName = dbProperties.getProperty("database.user");
-		password = dbProperties.getProperty("database.password");  */
+
 		dbConn = new CdsAS400Connection(dbFile);
 		try {
 			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());

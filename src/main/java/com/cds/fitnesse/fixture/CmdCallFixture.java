@@ -25,7 +25,7 @@ public class CmdCallFixture extends DoFixture {
 	//private static final String driverName = "com.ibm.as400.access.AS400JDBCDriver";
 	private CdsAS400Connection dbConn = null;
 	private String returnMsg = "";
-	private String dbFile = "db.properties";
+	private String dbFile = "C:/users/mpatrick/db.properties";
 	
 	public AS400 getAS400(String sys, String user, String password) throws IOException, AS400SecurityException {
 		AS400 serv = new AS400(sys, user, password);
@@ -52,7 +52,7 @@ public class CmdCallFixture extends DoFixture {
 		}
 		AS400 serv = null;
 		try {
-			serv = getAS400("SERV", dbConn.getUser(), dbConn.getPassword());
+			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -89,29 +89,15 @@ public class CmdCallFixture extends DoFixture {
 	        return "Command failed";
 		}			
 	}
-/*	/**
-	 * Gets the dbunit properties that are used to load data for each row.
-	 * 
-	 * @return Properties
-	 * 
-	 * @throws Exception
-	 */
-/*	protected Properties getDbProperties() throws Exception {
-		if (this.dbProperties == null) {
-			this.dbProperties = new Properties();
-			try {
-				if( this.applicationName != null && this.applicationName != "" )
-				{
-					this.dbProperties.load(new FileInputStream(this.applicationName + ".properties"));
-				}
-				else
-				{
-					this.dbProperties.load(new FileInputStream( "db.properties" ) );
-				}
-			} catch (IOException e) {
-				throw new Exception("Couldn't find dbUnit properties file.");
-			}
+	public String loginUserPassword(String dataSource, String userName, String password){
+		
+		if (!(dataSource.isEmpty())){
+			this.dbConn.setDataSource(dataSource);
 		}
-		return this.dbProperties;
-	}	*/
+		this.dbConn.setUser(userName);
+		this.dbConn.setPassword(password);
+		
+		
+	}
+
 }
