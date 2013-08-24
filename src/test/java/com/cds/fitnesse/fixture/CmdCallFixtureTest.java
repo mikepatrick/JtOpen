@@ -1,5 +1,7 @@
 package com.cds.fitnesse.fixture;
 
+import com.cds.fitnesse.utils.CdsAS400Connection;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -31,8 +33,10 @@ public class CmdCallFixtureTest
     /**
      * Rigourous Test :-)
      */
-    public void testApp()
-    {
-        assertTrue( true );
+    public void TestRunCmdGoodConnection(){
+    	
+    }
+    public void TestRunCmdBadConnection(){
+    	
     }
 }

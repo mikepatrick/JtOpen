@@ -8,8 +8,8 @@ public class CdsAS400Connection {
 	protected Properties dbProperties = null;
 	protected String applicationName = null;
 	
-	public CdsAS400Connection() throws Exception {
-		this.getDbProperties();
+	public CdsAS400Connection(String filename)  {
+		this.getDbProperties(filename);
 	}
 	/**
 	 * Gets the dbunit properties that are used to load data for each row.
@@ -18,54 +18,59 @@ public class CdsAS400Connection {
 	 * 
 	 * @throws Exception
 	 */
-	protected Properties getDbProperties() throws Exception {
+	protected Properties getDbProperties(String filename)  {
 		if (this.dbProperties == null) {
 			this.dbProperties = new Properties();
-			try {
-				if( this.applicationName != null && this.applicationName != "" )
-				{
-					this.dbProperties.load(new FileInputStream(this.applicationName + ".properties"));
-				}
-				else
-				{
-					this.dbProperties.load(new FileInputStream( "db.properties" ) );
-				}
+			try {	
+				this.dbProperties.load(new FileInputStream(filename) );
 			} catch (IOException e) {
-				throw new Exception("Couldn't find dbUnit properties file.");
+			//	this.dbProperties = null;
+			//	return this.dbProperties;
+				return null;
+				//throw new Exception("Couldn't find dbUnit properties file.");
 			}
 		}
 		return this.dbProperties;
 	}
 	public String getUser() {
-		try {
-			return this.getDbProperties().getProperty("database.user");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return " ";
-		}
+	
+		return this.dbProperties.getProperty("database.user");
+		
 	}
 	public String getPassword() {
-		try {
-			return this.getDbProperties().getProperty("database.password");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return " ";
-		}
+		
+		return this.dbProperties.getProperty("database.password");
+
 	}
 	public String getDriverName() {
-		try {
-			return this.getDbProperties().getProperty("database.driver");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return " ";
-		}
+	
+		return this.dbProperties.getProperty("database.driver");
+
 	}
 	public String getDataSource(){
-		try {
-			return this.getDbProperties().getProperty("database.url");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return " ";
-		}
+		
+		return this.dbProperties.getProperty("database.url");
+	
 	}	
+	public String setUser(String userName){
+		if (userName.isEmpty()){
+			return this.dbProperties.getProperty("database.user"); 
+		}
+		this.dbProperties.setProperty("database.user", userName);
+		return this.dbProperties.getProperty("database.user");
+	}
+	public String setPassword(String pwd){
+		if (pwd.isEmpty()){
+			return this.dbProperties.getProperty("database.password"); 
+		}		
+		this.dbProperties.setProperty("database.password", pwd);
+		return this.dbProperties.getProperty("database.password");
+	}	
+	public String setDataSource(String url){
+		if (url.isEmpty()){
+			return this.dbProperties.getProperty("database.url"); 
+		}		
+		this.dbProperties.setProperty("database.url", url);
+		return this.dbProperties.getProperty("database.url");
+	}		
 }

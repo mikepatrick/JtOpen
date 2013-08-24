@@ -24,6 +24,8 @@ public class CmdCallFixture extends DoFixture {
 	private static final String url = "jdbc:as400://serv.cdsfulfillment.com/;user=WWWAUTOT;password=cds999;transaction isolation=none;errors=full;";
 	//private static final String driverName = "com.ibm.as400.access.AS400JDBCDriver";
 	private CdsAS400Connection dbConn = null;
+	private String returnMsg = "";
+	private String dbFile = "db.properties";
 	
 	public AS400 getAS400(String sys, String user, String password) throws IOException, AS400SecurityException {
 		AS400 serv = new AS400(sys, user, password);
@@ -40,7 +42,7 @@ public class CmdCallFixture extends DoFixture {
 	
 	public String runcmd(String command) throws Exception  {
 
-		dbConn = new CdsAS400Connection();
+		dbConn = new CdsAS400Connection(dbFile);
 		try {
 			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
 		} catch (Exception e1) {
@@ -70,12 +72,14 @@ public class CmdCallFixture extends DoFixture {
 			}
 			
 			AS400Message[] messagelist = cmd.getMessageList();
+			returnMsg = "";
 			for (int i = 0; i < messagelist.length; ++i){
         
             // Show each message.
 				System.out.println(messagelist[i].getText());
+				returnMsg.concat(messagelist[i].getText());
 			}	 
-			return messagelist[0].getText();
+			return returnMsg;
 			
 		}
 		catch (Exception e)
