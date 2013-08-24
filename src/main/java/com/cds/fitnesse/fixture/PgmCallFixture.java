@@ -1,6 +1,6 @@
 package com.cds.fitnesse.fixture;
 
-import java.io.FileInputStream;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,13 +11,12 @@ import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.AS400Text;
-import com.ibm.as400.access.CommandCall;
 import com.ibm.as400.access.ProgramCall;
 import com.ibm.as400.access.ProgramParameter;
 
-import fitlibrary.DoFixture;
+import fitlibrary.SequenceFixture;
 
-public class PgmCallFixture extends DoFixture {
+public class PgmCallFixture extends SequenceFixture {
 
 	private static final String SERV = "SERV";
 	protected String applicationName = null;
@@ -48,7 +47,6 @@ public class PgmCallFixture extends DoFixture {
 		try {
 			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			return "Obtaining Connection failed @ getJDBCConnection()";
 		}
@@ -56,13 +54,11 @@ public class PgmCallFixture extends DoFixture {
 		try {
 			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return "Could not create AS400 object @ getAS400() - IOException";
 		} catch (AS400SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return "Could not create AS400 object @ GETas400() - AS400SecurityException";
+			return "Could not create AS400 object @ getAS400() - AS400SecurityException";
 		}		
 		
 	    ProgramCall pgm = new ProgramCall(serv);

@@ -11,7 +11,7 @@
 </target>
 
 <target name="compile" depends="init">
-<javac srcdir="${src}" destdir="${build}"/>
+<javac srcdir="${src}" destdir="${build}" debug="on"/>
 </target>
 
   <target name="dist" depends="compile"
@@ -20,7 +20,8 @@
     <mkdir dir="${dist}/lib"/>
 
     <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-    <jar jarfile="${dist}/lib/MyProject-${DSTAMP}.jar" basedir="${build}"/>
+    <jar jarfile="${dist}/lib/CallFixtures-${DSTAMP}.jar" basedir="${build}"/>
+    <jar jarfile="${dist}/lib/CallFixtures.jar" basedir="${build}"/>
   </target>
 
   <target name="clean"
