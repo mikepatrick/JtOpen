@@ -1,6 +1,7 @@
 package com.cds.fitnesse.fixture;
 
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -17,9 +18,9 @@ import com.ibm.as400.access.AS400Text;
 import com.ibm.as400.access.ProgramCall;
 import com.ibm.as400.access.ProgramParameter;
 
-import fitlibrary.SequenceFixture;
+import fitlibrary.ArrayFixture;
 
-public class PgmCallFixture extends SequenceFixture {
+public class PgmCallArrayFixture extends ArrayFixture {
  
 	private static final String SERV = "SERV";
 	private static final String CHAR = "CHAR";
@@ -31,7 +32,14 @@ public class PgmCallFixture extends SequenceFixture {
 	private CdsAS400Connection dbConn = null;
 	private String returnMsg = "";
 	private String dbFile = "db.properties";
+	private ArrayList<parmInfo> parmsInfo = null;
+	private ProgramParameter[] parameterList = null;
+	private String qualifiedProgramName;
 	
+	public PgmCallArrayFixture () throws Exception{
+		super.getArgs();
+		parmsInfo = runpgm();
+	}
 	public AS400 getAS400(String sys, String user, String password) throws IOException, AS400SecurityException {
 		AS400 serv = new AS400(sys, user, password);
 		serv.connectService(AS400.COMMAND);
@@ -44,15 +52,13 @@ public class PgmCallFixture extends SequenceFixture {
 		Class driverClass = Class.forName(driverName);
 		return DriverManager.getConnection(driverUrl, userName, password);		  
 	}
-
-	
-	public String runpgm() throws Exception  {
+	private ArrayList<parmInfo> setUpParameters() throws PropertyVetoException{
 		if (args.length == 0){
-			return "No arguments passed";
+			return parmsInfo;
 		}
 		// Validate library, program name
 		if (args.length < 3){
-			return "Not enough arguments found";
+			return parmsInfo;
 		}
 		
 		int numArgs = 0;
@@ -60,20 +66,20 @@ public class PgmCallFixture extends SequenceFixture {
 		try{
      		numArgs = Integer.parseInt(args[0]);
 		} catch (NumberFormatException e) {
-			return "First argument is # of parms and must be numeric.";
+			return parmsInfo;
 		}
 		int numCells = (numArgs * 4);
 		String libName = args[1];
 		String pgmName = args[2];
-		String qualifiedProgramName = "/QSYS.LIB/".concat(libName).concat(".LIB/").concat(pgmName).concat(".PGM");
-		ArrayList<parmInfo> parmsInfo = new ArrayList<parmInfo>();
+		qualifiedProgramName = "/QSYS.LIB/".concat(libName).concat(".LIB/").concat(pgmName).concat(".PGM");
+		parmsInfo = new ArrayList<parmInfo>();
 		
 		for(int i = 3; i < numCells; ){
 			parmsInfo.add(new parmInfo(args[i], args[i+1], args[i+2], args[i+3]));
 			i = i+4;
 		}
         // Set up the parameters.
-        ProgramParameter[] parameterList = new ProgramParameter[parmsInfo.size()];
+        parameterList = new ProgramParameter[parmsInfo.size()];
       		
 		for(int i = 0; i < parmsInfo.size(); i++){
 			parameterList[i] = new ProgramParameter(parmsInfo.get(i).dataLength);
@@ -87,44 +93,35 @@ public class PgmCallFixture extends SequenceFixture {
 				parameterList[i] = new ProgramParameter(decParm.toBytes(new BigDecimal(parmsInfo.get(i).dataValue)));
 				parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);
 			}
-		}
+		}		
+		return parmsInfo;
+	}
+	
+	public ArrayList<parmInfo> runpgm() throws Exception  {
+		
+		parmsInfo = setUpParameters();
 		
 		dbConn = new CdsAS400Connection(dbFile);
 		try {
 			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
 		} catch (Exception e1) {
 			e1.printStackTrace();
-			return "Obtaining Connection failed @ getJDBCConnection()";
+			return parmsInfo;
 		}
 		AS400 serv = null;
 		try {
 			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		} catch (IOException e) {
 			e.printStackTrace();
-			return "Could not create AS400 object @ getAS400() - IOException";
+			return parmsInfo;
 		} catch (AS400SecurityException e) {
 			e.printStackTrace();
-			return "Could not create AS400 object @ getAS400() - AS400SecurityException";
+			return parmsInfo;
 		}		
 		
 	    ProgramCall pgm = new ProgramCall(serv);
 	    try
-	    {
-	        // Initialize the name of the program to run.
-	        //String programName = "/QSYS.LIB/MPATRICK.LIB/TESTPROG.PGM";
-	        // Set up the 3 parameters.
-	        // ProgramParameter[] parameterList = new ProgramParameter[3];
-	        // First parameter is to input a name.
-	        //AS400Text nametext = new AS400Text(8);
-	        //parameterList[0] = new ProgramParameter(nametext.toBytes("John Doe"));
-	        // Second parameter is to get the answer, up to 50 bytes long.
-	        //parameterList[1] = new ProgramParameter(50);
-	        // Third parameter is to input a quantity and return a value up to 30 bytes long.
-	        //byte[] quantity = new byte[2];
-	        //quantity[0] = 1;  quantity[1] = 44;
-	        //parameterList[2] = new ProgramParameter(quantity, 30);
-	        // Set the program name and parameter list.
-	    	
+	    {   	
 	        pgm.setProgram(qualifiedProgramName, parameterList);
 	        // Run the program.
 	        if (pgm.run() != true)
@@ -141,46 +138,35 @@ public class PgmCallFixture extends SequenceFixture {
 	                returnMsg = returnMsg.concat(messagelist[i].getText());
 	                
 	            }
-	            return returnMsg;
+	            return parmsInfo;
 	        }
 	        // Else no error, get output data.
 	        else
-	        { 
-	        	
-	        	
+	        { 	
 	    		for(int i = 0; i < parmsInfo.size(); i++){
 	    			
 	    			if (parmsInfo.get(i).dataType.equals(CHAR)){
 	    		        AS400Text text = new AS400Text(parmsInfo.get(i).dataLength);
-	    		        returnMsg = returnMsg.concat(parmsInfo.get(i).dataName).concat(": ");
-	    		        returnMsg = returnMsg.concat((String) text.toObject(parameterList[0].getOutputData()));
-	    		        returnMsg = returnMsg.concat(", ");
+	    		     
+	    		        parmsInfo.get(i).dataValue = ((String) text.toObject(parameterList[0].getOutputData()));
+	    		       
 	    			}
 	    			if(parmsInfo.get(i).dataType.equals(NUM)){
 	    				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, 0);
-	    				returnMsg = returnMsg.concat(parmsInfo.get(i).dataName).concat(": ");
-	    				returnMsg = returnMsg.concat(((BigDecimal) decParm.toObject(parameterList[1].getOutputData())).toString());
-	    				returnMsg = returnMsg.concat(", ");
+	    				
+	    				parmsInfo.get(i).dataValue = (((BigDecimal) decParm.toObject(parameterList[1].getOutputData())).toString());
+	    			
 	    			}
 	    		}	        	
 	        	
-	        	
-	         //     AS400Text text = new AS400Text(10);
-	         //     AS400PackedDecimal packedDec = new AS400PackedDecimal(15, 0);
-	         //     String outData = (String) text.toObject(parameterList[0].getOutputData());
-	         //     BigDecimal outData2 = (BigDecimal) packedDec.toObject(parameterList[1].getOutputData());
-	         //     returnMsg = returnMsg.concat(outData);
-	         //     returnMsg = returnMsg.concat(outData2.toString());
-	         ////   returnMsg = returnMsg.concat(parameterList[0].getOutputData().toString());
-	         ////  returnMsg = returnMsg.concat(parameterList[1].getOutputData().toString());
-	            return returnMsg;
+	    		return parmsInfo;
 	        }
 	    }
 	    catch (Exception e)
 	    {
 	        System.out.println("Program " + pgm.getProgram() + " issued an exception!");
 	        e.printStackTrace();
-	        return "Program " + pgm.getProgram() + " issued an exception!";
+	        return parmsInfo;
 	        
 	    }
 	    // Done with the system.
@@ -199,5 +185,10 @@ public class PgmCallFixture extends SequenceFixture {
 			this.dataValue = dataValue;
 		}
 	}
+	@Override
+	public Class<?> getTargetClass() {
+		return parmInfo.class;
+	}
+
 }
 
