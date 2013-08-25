@@ -48,10 +48,10 @@ public class CmdCallFixture extends DoFixture {
 		}
 		AS400 serv = null;
 		try {
-			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return "Could not create AS400 object @ getAS400() - IOException";
+			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());			
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			return "Could not create AS400 object @ getAS400() - IOException";
 		} catch (AS400SecurityException e) {
 			e.printStackTrace();
 			return "Could not create AS400 object @ getAS400() - AS400SecurityException";
@@ -71,10 +71,10 @@ public class CmdCallFixture extends DoFixture {
         
             // Show each message.
 				System.out.println(messagelist[i].getText());
-				returnMsg.concat(messagelist[i].getText());
+				returnMsg = returnMsg.concat(messagelist[i].getText());
 			}	 
+			//return returnMsg;
 			return returnMsg;
-			
 		}
 		catch (Exception e)
 		{
@@ -109,5 +109,5 @@ public class CmdCallFixture extends DoFixture {
 		}				
 		return "Credentials changed";
 	}
-
+	
 }

@@ -2,13 +2,16 @@ package com.cds.fitnesse.fixture;
 
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Message;
+import com.ibm.as400.access.AS400PackedDecimal;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.AS400Text;
 import com.ibm.as400.access.ProgramCall;
@@ -17,8 +20,10 @@ import com.ibm.as400.access.ProgramParameter;
 import fitlibrary.SequenceFixture;
 
 public class PgmCallFixture extends SequenceFixture {
-
+ 
 	private static final String SERV = "SERV";
+	private static final String CHAR = "CHAR";
+	private static final String NUM = "NUM";
 	protected String applicationName = null;
 	protected Properties dbProperties = null;
 	private static final String url = "jdbc:as400://serv.cdsfulfillment.com/;user=WWWAUTOT;password=cds999;transaction isolation=none;errors=full;";
@@ -41,8 +46,47 @@ public class PgmCallFixture extends SequenceFixture {
 	}
 
 	
-	public String runpgm(String command) throws Exception  {
-
+	public String runpgm() throws Exception  {
+		if (args.length == 0){
+			return "No arguments passed";
+		}
+		// Validate library, program name
+		if (args.length < 3){
+			return "Not enough arguments found";
+		}
+		
+		int numArgs = 0;
+		
+		try{
+     		numArgs = Integer.parseInt(args[0]);
+		} catch (NumberFormatException e) {
+			return "First argument is # of parms and must be numeric.";
+		}
+		int numCells = (numArgs * 4);
+		String libName = args[1];
+		String pgmName = args[2];
+		String qualifiedProgramName = "/QSYS.LIB/".concat(libName).concat(".LIB/").concat(pgmName).concat(".PGM");
+		ArrayList<parmInfo> parmsInfo = new ArrayList<parmInfo>();
+		
+		for(int i = 3; i < numCells; ){
+			parmsInfo.add(new parmInfo(args[i], args[i+1], args[i+2], args[i+3]));
+			i = i+4;
+		}
+        // Set up the parameters.
+        ProgramParameter[] parameterList = new ProgramParameter[parmsInfo.size()];
+      		
+		for(int i = 0; i < parmsInfo.size(); i++){
+			parameterList[i] = new ProgramParameter(parmsInfo.get(i).dataLength);
+			if (parmsInfo.get(i).dataType.equals(CHAR)){
+		        AS400Text nametext = new AS400Text(parmsInfo.get(i).dataLength);
+		        parameterList[i] = new ProgramParameter(nametext.toBytes(parmsInfo.get(i).dataValue));				
+			}
+			if(parmsInfo.get(i).dataType.equals(NUM)){
+				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, 0);
+				parameterList[i] = new ProgramParameter(decParm.toBytes(new BigDecimal(parmsInfo.get(i).dataValue)));
+			}
+		}
+		
 		dbConn = new CdsAS400Connection(dbFile);
 		try {
 			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
@@ -65,20 +109,21 @@ public class PgmCallFixture extends SequenceFixture {
 	    try
 	    {
 	        // Initialize the name of the program to run.
-	        String programName = "/QSYS.LIB/TESTLIB.LIB/TESTPROG.PGM";
+	        //String programName = "/QSYS.LIB/MPATRICK.LIB/TESTPROG.PGM";
 	        // Set up the 3 parameters.
-	        ProgramParameter[] parameterList = new ProgramParameter[3];
+	        // ProgramParameter[] parameterList = new ProgramParameter[3];
 	        // First parameter is to input a name.
-	        AS400Text nametext = new AS400Text(8);
-	        parameterList[0] = new ProgramParameter(nametext.toBytes("John Doe"));
+	        //AS400Text nametext = new AS400Text(8);
+	        //parameterList[0] = new ProgramParameter(nametext.toBytes("John Doe"));
 	        // Second parameter is to get the answer, up to 50 bytes long.
-	        parameterList[1] = new ProgramParameter(50);
+	        //parameterList[1] = new ProgramParameter(50);
 	        // Third parameter is to input a quantity and return a value up to 30 bytes long.
-	        byte[] quantity = new byte[2];
-	        quantity[0] = 1;  quantity[1] = 44;
-	        parameterList[2] = new ProgramParameter(quantity, 30);
+	        //byte[] quantity = new byte[2];
+	        //quantity[0] = 1;  quantity[1] = 44;
+	        //parameterList[2] = new ProgramParameter(quantity, 30);
 	        // Set the program name and parameter list.
-	        pgm.setProgram(programName, parameterList);
+	    	
+	        pgm.setProgram(qualifiedProgramName, parameterList);
 	        // Run the program.
 	        if (pgm.run() != true)
 	        {
@@ -91,7 +136,7 @@ public class PgmCallFixture extends SequenceFixture {
 	            {
 	                // Show each message.
 	                System.out.println(messagelist[i]);
-	                returnMsg.concat(messagelist[i].getText());
+	                returnMsg = returnMsg.concat(messagelist[i].getText());
 	                
 	            }
 	            return returnMsg;
@@ -117,5 +162,18 @@ public class PgmCallFixture extends SequenceFixture {
 	    // Done with the system.
 	    // serv.disconnectAllServices();		
 	}
-
+	private class parmInfo{
+		public String dataName;
+		public String dataType;
+		public int dataLength;
+		public String dataValue;
+		
+		public parmInfo(String dataName, String dataType, String dataLength, String dataValue){
+			this.dataName = dataName;
+			this.dataType = dataType;
+			this.dataLength = Integer.parseInt(dataLength);
+			this.dataValue = dataValue;
+		}
+	}
 }
+
