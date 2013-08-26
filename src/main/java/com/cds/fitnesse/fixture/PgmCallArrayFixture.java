@@ -148,13 +148,13 @@ public class PgmCallArrayFixture extends ArrayFixture {
 	    			if (parmsInfo.get(i).dataType.equals(CHAR)){
 	    		        AS400Text text = new AS400Text(parmsInfo.get(i).dataLength);
 	    		     
-	    		        parmsInfo.get(i).dataValue = ((String) text.toObject(parameterList[0].getOutputData()));
+	    		        parmsInfo.get(i).dataValue = ((String) text.toObject(parameterList[i].getOutputData()));
 	    		       
 	    			}
 	    			if(parmsInfo.get(i).dataType.equals(NUM)){
 	    				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, 0);
 	    				
-	    				parmsInfo.get(i).dataValue = (((BigDecimal) decParm.toObject(parameterList[1].getOutputData())).toString());
+	    				parmsInfo.get(i).dataValue = (((BigDecimal) decParm.toObject(parameterList[i].getOutputData())).toString());
 	    			
 	    			}
 	    		}	        	

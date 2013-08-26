@@ -15,6 +15,7 @@ import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.AS400PackedDecimal;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.AS400Text;
+import com.ibm.as400.access.AS400ZonedDecimal;
 import com.ibm.as400.access.ProgramCall;
 import com.ibm.as400.access.ProgramParameter;
 
@@ -25,6 +26,7 @@ public class PgmCallRowFixture extends RowFixture {
 	private static final String SERV = "SERV";
 	private static final String CHAR = "CHAR";
 	private static final String NUM = "NUM";
+	private static final String ZON = "ZON";
 	protected String applicationName = null;
 	protected Properties dbProperties = null;
 	private static final String url = "jdbc:as400://serv.cdsfulfillment.com/;user=WWWAUTOT;password=cds999;transaction isolation=none;errors=full;";
@@ -89,6 +91,11 @@ public class PgmCallRowFixture extends RowFixture {
 				parameterList[i] = new ProgramParameter(decParm.toBytes(new BigDecimal(parmsInfo.get(i).dataValue)));
 				parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);
 			}
+			if(parmsInfo.get(i).dataType.equals(ZON)){
+				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, 0);
+				parameterList[i] = new ProgramParameter(zonParm.toBytes(new BigDecimal(parmsInfo.get(i).dataValue)));
+				parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);				
+			}
 		}		
 		return parmsInfo;
 	}
@@ -144,14 +151,18 @@ public class PgmCallRowFixture extends RowFixture {
 	    			if (parmsInfo.get(i).dataType.equals(CHAR)){
 	    		        AS400Text text = new AS400Text(parmsInfo.get(i).dataLength);
 	    		     
-	    		        parmsInfo.get(i).dataValue = ((String) text.toObject(parameterList[0].getOutputData()));
+	    		        parmsInfo.get(i).dataValue = ((String) text.toObject(parameterList[i].getOutputData()));
 	    		       
 	    			}
 	    			if(parmsInfo.get(i).dataType.equals(NUM)){
 	    				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, 0);
 	    				
-	    				parmsInfo.get(i).dataValue = (((BigDecimal) decParm.toObject(parameterList[1].getOutputData())).toString());
+	    				parmsInfo.get(i).dataValue = (((BigDecimal) decParm.toObject(parameterList[i].getOutputData())).toString());
 	    			
+	    			}
+	    			if(parmsInfo.get(i).dataType.equals(ZON)){
+	    				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, 0);
+	    				parmsInfo.get(i).dataValue = (((BigDecimal) zonParm.toObject(parameterList[i].getOutputData())).toString());
 	    			}
 	    		}	        	
 	        	

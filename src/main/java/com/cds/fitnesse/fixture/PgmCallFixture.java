@@ -14,6 +14,7 @@ import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.AS400PackedDecimal;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.AS400Text;
+import com.ibm.as400.access.AS400ZonedDecimal;
 import com.ibm.as400.access.ProgramCall;
 import com.ibm.as400.access.ProgramParameter;
 
@@ -24,6 +25,7 @@ public class PgmCallFixture extends SequenceFixture {
 	private static final String SERV = "SERV";
 	private static final String CHAR = "CHAR";
 	private static final String NUM = "NUM";
+	private static final String ZON = "ZON";
 	protected String applicationName = null;
 	protected Properties dbProperties = null;
 	private static final String url = "jdbc:as400://serv.cdsfulfillment.com/;user=WWWAUTOT;password=cds999;transaction isolation=none;errors=full;";
@@ -87,6 +89,11 @@ public class PgmCallFixture extends SequenceFixture {
 				parameterList[i] = new ProgramParameter(decParm.toBytes(new BigDecimal(parmsInfo.get(i).dataValue)));
 				parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);
 			}
+			if(parmsInfo.get(i).dataType.equals(ZON)){
+				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, 0);
+				parameterList[i] = new ProgramParameter(zonParm.toBytes(new BigDecimal(parmsInfo.get(i).dataValue)));
+				parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);				
+			}			
 		}
 		
 		dbConn = new CdsAS400Connection(dbFile);
@@ -153,15 +160,21 @@ public class PgmCallFixture extends SequenceFixture {
 	    			if (parmsInfo.get(i).dataType.equals(CHAR)){
 	    		        AS400Text text = new AS400Text(parmsInfo.get(i).dataLength);
 	    		        returnMsg = returnMsg.concat(parmsInfo.get(i).dataName).concat(": ");
-	    		        returnMsg = returnMsg.concat((String) text.toObject(parameterList[0].getOutputData()));
+	    		        returnMsg = returnMsg.concat((String) text.toObject(parameterList[i].getOutputData()));
 	    		        returnMsg = returnMsg.concat(", ");
 	    			}
 	    			if(parmsInfo.get(i).dataType.equals(NUM)){
 	    				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, 0);
 	    				returnMsg = returnMsg.concat(parmsInfo.get(i).dataName).concat(": ");
-	    				returnMsg = returnMsg.concat(((BigDecimal) decParm.toObject(parameterList[1].getOutputData())).toString());
+	    				returnMsg = returnMsg.concat(((BigDecimal) decParm.toObject(parameterList[i].getOutputData())).toString());
 	    				returnMsg = returnMsg.concat(", ");
 	    			}
+	    			if(parmsInfo.get(i).dataType.equals(ZON)){
+	    				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, 0);
+	    				returnMsg = returnMsg.concat(parmsInfo.get(i).dataName).concat(": ");
+	    				returnMsg = returnMsg.concat(((BigDecimal) zonParm.toObject(parameterList[i].getOutputData())).toString());
+	    				returnMsg = returnMsg.concat(", ");	    				
+	    			}	    			
 	    		}	        	
 	        	
 	        	
