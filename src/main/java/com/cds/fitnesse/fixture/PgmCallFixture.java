@@ -28,7 +28,7 @@ public class PgmCallFixture extends SequenceFixture {
 	private static final String ZON = "ZON";
 	protected String applicationName = null;
 	protected Properties dbProperties = null;
-	private static final String url = "jdbc:as400://serv.cdsfulfillment.com/;user=WWWAUTOT;password=cds999;transaction isolation=none;errors=full;";
+	//private static final String url = "jdbc:as400://serv.cdsfulfillment.com/;user=WWWAUTOT;password=cds999;transaction isolation=none;errors=full;";
 	//private static final String driverName = "com.ibm.as400.access.AS400JDBCDriver";
 	private CdsAS400Connection dbConn = null;
 	private String returnMsg = "";
@@ -85,12 +85,12 @@ public class PgmCallFixture extends SequenceFixture {
 		        parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);
 			}
 			if(parmsInfo.get(i).dataType.equals(NUM)){
-				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, 0);
+				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
 				parameterList[i] = new ProgramParameter(decParm.toBytes(new BigDecimal(parmsInfo.get(i).dataValue)));
 				parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);
 			}
 			if(parmsInfo.get(i).dataType.equals(ZON)){
-				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, 0);
+				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
 				parameterList[i] = new ProgramParameter(zonParm.toBytes(new BigDecimal(parmsInfo.get(i).dataValue)));
 				parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);				
 			}			
@@ -164,13 +164,13 @@ public class PgmCallFixture extends SequenceFixture {
 	    		        returnMsg = returnMsg.concat(", ");
 	    			}
 	    			if(parmsInfo.get(i).dataType.equals(NUM)){
-	    				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, 0);
+	    				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
 	    				returnMsg = returnMsg.concat(parmsInfo.get(i).dataName).concat(": ");
 	    				returnMsg = returnMsg.concat(((BigDecimal) decParm.toObject(parameterList[i].getOutputData())).toString());
 	    				returnMsg = returnMsg.concat(", ");
 	    			}
 	    			if(parmsInfo.get(i).dataType.equals(ZON)){
-	    				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, 0);
+	    				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
 	    				returnMsg = returnMsg.concat(parmsInfo.get(i).dataName).concat(": ");
 	    				returnMsg = returnMsg.concat(((BigDecimal) zonParm.toObject(parameterList[i].getOutputData())).toString());
 	    				returnMsg = returnMsg.concat(", ");	    				
@@ -199,16 +199,26 @@ public class PgmCallFixture extends SequenceFixture {
 	    // Done with the system.
 	    // serv.disconnectAllServices();		
 	}
-	private class parmInfo{
+	protected class parmInfo{
 		public String dataName;
 		public String dataType;
 		public int dataLength;
 		public String dataValue;
-		
+		public int decimalLength;
 		public parmInfo(String dataName, String dataType, String dataLength, String dataValue){
 			this.dataName = dataName;
 			this.dataType = dataType;
-			this.dataLength = Integer.parseInt(dataLength);
+			if (dataLength.contains(",")){
+				String[] splitLength = dataLength.split(",");
+				String totalLength = splitLength[0];
+				String decimalLength = splitLength[1];
+				this.dataLength = Integer.parseInt(totalLength);
+				this.decimalLength = Integer.parseInt(decimalLength);
+			}else{
+				this.dataLength = Integer.parseInt(dataLength);
+				this.decimalLength = 0;
+			}
+
 			this.dataValue = dataValue;
 		}
 	}

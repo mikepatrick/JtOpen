@@ -87,12 +87,12 @@ public class PgmCallRowFixture extends RowFixture {
 		        parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);
 			}
 			if(parmsInfo.get(i).dataType.equals(NUM)){
-				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, 0);
+				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
 				parameterList[i] = new ProgramParameter(decParm.toBytes(new BigDecimal(parmsInfo.get(i).dataValue)));
 				parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);
 			}
 			if(parmsInfo.get(i).dataType.equals(ZON)){
-				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, 0);
+				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
 				parameterList[i] = new ProgramParameter(zonParm.toBytes(new BigDecimal(parmsInfo.get(i).dataValue)));
 				parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);				
 			}
@@ -155,13 +155,13 @@ public class PgmCallRowFixture extends RowFixture {
 	    		       
 	    			}
 	    			if(parmsInfo.get(i).dataType.equals(NUM)){
-	    				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, 0);
+	    				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
 	    				
 	    				parmsInfo.get(i).dataValue = (((BigDecimal) decParm.toObject(parameterList[i].getOutputData())).toString());
 	    			
 	    			}
 	    			if(parmsInfo.get(i).dataType.equals(ZON)){
-	    				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, 0);
+	    				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
 	    				parmsInfo.get(i).dataValue = (((BigDecimal) zonParm.toObject(parameterList[i].getOutputData())).toString());
 	    			}
 	    		}	        	
@@ -184,11 +184,21 @@ public class PgmCallRowFixture extends RowFixture {
 		public String dataType;
 		public int dataLength;
 		public String dataValue;
-		
+		public int decimalLength;
 		public parmInfo(String dataName, String dataType, String dataLength, String dataValue){
 			this.dataName = dataName;
 			this.dataType = dataType;
-			this.dataLength = Integer.parseInt(dataLength);
+			if ((dataLength.contains(","))){
+				String[] splitLength = dataLength.split(",");
+				String totalLength = splitLength[0];
+				String decimalLength = splitLength[1];
+				this.dataLength = Integer.parseInt(totalLength);
+				this.decimalLength = Integer.parseInt(decimalLength);
+			}else{
+				this.dataLength = Integer.parseInt(dataLength);
+				this.decimalLength = 0;
+			}
+
 			this.dataValue = dataValue;
 		}
 	}
