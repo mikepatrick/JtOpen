@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Properties;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
@@ -187,18 +188,41 @@ public class PgmCallRowFixture extends RowFixture {
 	        { 	
 	        	if(singleLinkparm){
 	        		int linkparmOffset = 0;
+	        		int linkparmLength = parameterList[0].getOutputDataLength();
+	        		byte[] retLinkparm = parameterList[0].getOutputData();
+    				
+    				
+    				
+    				
 	        		for(int i = 0; i < parmsInfo.size(); i++){
 	        			if (parmsInfo.get(i).dataType.equals(CHAR)){
-	    					AS400Text text = new AS400Text(parmsInfo.get(i).dataLength);parmsInfo.get(i).dataValue = ((String) text.toObject(parameterList[i].getOutputData()));
+	    					//AS400Text text = new AS400Text(parmsInfo.get(i).dataLength);
+	        				//parmsInfo.get(i).dataValue = ((String) text.toObject(parameterList[i].getOutputData()));
 	    					// linkparm work to do here to set outparm values
+	        				int numBytes = parmsInfo.get(i).byteLength;
+	        				byte[] thisparm = new byte[numBytes];
+	        				AS400Text text = new AS400Text(numBytes);
+	        				thisparm = Arrays.copyOfRange(retLinkparm, linkparmOffset, linkparmOffset + numBytes);
+	        				parmsInfo.get(i).dataValue = ((String) text.toObject(Arrays.copyOfRange(thisparm, 0, numBytes)));
+	        				linkparmOffset += numBytes;
 	    				}
 	    				if(parmsInfo.get(i).dataType.equals(NUM)){
+	        				int numBytes = parmsInfo.get(i).byteLength;
+	        				byte[] thisparm = new byte[numBytes];	    					
 	    					AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
-	    					parmsInfo.get(i).dataValue = (((BigDecimal) decParm.toObject(parameterList[i].getOutputData())).toString());
+	    					thisparm = Arrays.copyOfRange(retLinkparm, linkparmOffset, linkparmOffset + numBytes);
+	    					parmsInfo.get(i).dataValue = (((BigDecimal) decParm.toObject(thisparm)).toString());
+	    					//parmsInfo.get(i).dataValue = (((BigDecimal) decParm.toObject(parameterList[i].getOutputData())).toString());
+	    					linkparmOffset += numBytes;
+	    					
 	    				}
 	    				if(parmsInfo.get(i).dataType.equals(ZON)){
+	        				int numBytes = parmsInfo.get(i).byteLength;
+	        				byte[] thisparm = new byte[numBytes];	    					
 	    					AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
-	    					parmsInfo.get(i).dataValue = (((BigDecimal) zonParm.toObject(parameterList[i].getOutputData())).toString());
+	    					thisparm = Arrays.copyOfRange(retLinkparm, linkparmOffset, linkparmOffset + numBytes);
+	    					parmsInfo.get(i).dataValue = (((BigDecimal) zonParm.toObject(thisparm)).toString());
+	    					linkparmOffset += numBytes;
 	    				}	        			
 	        		}
 	        	}else{

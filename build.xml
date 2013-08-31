@@ -22,6 +22,7 @@
     <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
     <jar jarfile="${dist}/lib/CallFixtures-${DSTAMP}.jar" basedir="${build}"/>
     <jar jarfile="${dist}/lib/CallFixtures.jar" basedir="${build}"/>
+    <jar jarfile="c:/users/mpatrick/downloads/fitnessewiki/fitnesseroot/files/lib/CallFixtures.jar" basedir="${build}"/>
   </target>
 
   <target name="clean"
