@@ -28,8 +28,6 @@ public class PgmCallFixture extends SequenceFixture {
 	private static final String ZON = "ZON";
 	protected String applicationName = null;
 	protected Properties dbProperties = null;
-	//private static final String url = "jdbc:as400://serv.cdsfulfillment.com/;user=WWWAUTOT;password=cds999;transaction isolation=none;errors=full;";
-	//private static final String driverName = "com.ibm.as400.access.AS400JDBCDriver";
 	private CdsAS400Connection dbConn = null;
 	private String returnMsg = "";
 	private String dbFile = "db.properties";
@@ -116,22 +114,7 @@ public class PgmCallFixture extends SequenceFixture {
 		
 	    ProgramCall pgm = new ProgramCall(serv);
 	    try
-	    {
-	        // Initialize the name of the program to run.
-	        //String programName = "/QSYS.LIB/MPATRICK.LIB/TESTPROG.PGM";
-	        // Set up the 3 parameters.
-	        // ProgramParameter[] parameterList = new ProgramParameter[3];
-	        // First parameter is to input a name.
-	        //AS400Text nametext = new AS400Text(8);
-	        //parameterList[0] = new ProgramParameter(nametext.toBytes("John Doe"));
-	        // Second parameter is to get the answer, up to 50 bytes long.
-	        //parameterList[1] = new ProgramParameter(50);
-	        // Third parameter is to input a quantity and return a value up to 30 bytes long.
-	        //byte[] quantity = new byte[2];
-	        //quantity[0] = 1;  quantity[1] = 44;
-	        //parameterList[2] = new ProgramParameter(quantity, 30);
-	        // Set the program name and parameter list.
-	    	
+	    {    	
 	        pgm.setProgram(qualifiedProgramName, parameterList);
 	        // Run the program.
 	        if (pgm.run() != true)
@@ -176,16 +159,7 @@ public class PgmCallFixture extends SequenceFixture {
 	    				returnMsg = returnMsg.concat(", ");	    				
 	    			}	    			
 	    		}	        	
-	        	
-	        	
-	         //     AS400Text text = new AS400Text(10);
-	         //     AS400PackedDecimal packedDec = new AS400PackedDecimal(15, 0);
-	         //     String outData = (String) text.toObject(parameterList[0].getOutputData());
-	         //     BigDecimal outData2 = (BigDecimal) packedDec.toObject(parameterList[1].getOutputData());
-	         //     returnMsg = returnMsg.concat(outData);
-	         //     returnMsg = returnMsg.concat(outData2.toString());
-	         ////   returnMsg = returnMsg.concat(parameterList[0].getOutputData().toString());
-	         ////  returnMsg = returnMsg.concat(parameterList[1].getOutputData().toString());
+	 
 	            return returnMsg;
 	        }
 	    }

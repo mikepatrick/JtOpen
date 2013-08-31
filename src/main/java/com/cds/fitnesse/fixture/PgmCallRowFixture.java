@@ -1,6 +1,5 @@
 package com.cds.fitnesse.fixture;
 
-
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -11,6 +10,7 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
+
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.AS400PackedDecimal;
@@ -31,9 +31,7 @@ public class PgmCallRowFixture extends RowFixture {
 	protected String applicationName = null;
 	protected Properties dbProperties = null;
 	private static final String url = "jdbc:as400://serv.cdsfulfillment.com/;user=WWWAUTOT;password=cds999;transaction isolation=none;errors=full;";
-	//private static final String driverName = "com.ibm.as400.access.AS400JDBCDriver";
 	private CdsAS400Connection dbConn = null;
-	private String returnMsg = "";
 	private String dbFile = "db.properties";
 	private ArrayList<parmInfo> parmsInfo = null;
 	private ProgramParameter[] parameterList = null;
@@ -164,13 +162,11 @@ public class PgmCallRowFixture extends RowFixture {
 	    		parameterList[0] = new ProgramParameter(linkparm);
 	    	}
 	        pgm.setProgram(qualifiedProgramName, parameterList);
-	        // Run the program.
+
 	        if (pgm.run() != true)
 	        {
-	            // Report failure.
+
 	            System.out.println("Program failed - pgm.run() did not return true");
-	            // Show the messages.
-	            returnMsg = "";
 	            AS400Message[] messagelist = pgm.getMessageList();
 	         // for (int i = 0; i < messagelist.length; ++i)
 	            for(int i = 0; i < parmsInfo.size(); i++)
