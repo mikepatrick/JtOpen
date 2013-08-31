@@ -31,7 +31,7 @@ public class CmdCallFixtureTest
     }
 
     /**
-     * Rigourous Test :-)
+     * Rigorous Test :-)
      */
     public void TestRunCmdGoodConnection(){
     	
