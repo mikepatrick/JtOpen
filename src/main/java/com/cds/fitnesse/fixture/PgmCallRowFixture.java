@@ -160,7 +160,7 @@ public class PgmCallRowFixture extends RowFixture {
 	    {   
 	    	if(singleLinkparm){
 	    		parameterList = new ProgramParameter[1];
-	    		parameterList[0] = new ProgramParameter(linkparm);
+	    		parameterList[0] = new ProgramParameter(linkparm, linkparm.length);
 	    	}
 	        pgm.setProgram(qualifiedProgramName, parameterList);
 
