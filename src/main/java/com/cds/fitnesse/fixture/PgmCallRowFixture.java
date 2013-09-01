@@ -44,12 +44,14 @@ public class PgmCallRowFixture extends RowFixture {
 		
 		return serv;
 	}
-	
-	private Connection getJDBCConnection(String driverName, String driverUrl, String userName, String password) throws Exception
-	{
-		Class driverClass = Class.forName(driverName);
-		return DriverManager.getConnection(driverUrl, userName, password);		  
-	}
+
+//  This code was abstracted into CdsAS400Connection.
+//	private Connection getJDBCConnection(String driverName, String driverUrl, String userName, String password) throws Exception
+//	{
+//		//register the driver
+//		Class driverClass = Class.forName(driverName);
+//		return DriverManager.getConnection(driverUrl, userName, password);		  
+//	}
 	private ArrayList<parmInfo> setUpParameters() throws PropertyVetoException{
 		singleLinkparm = false;
 		if (args.length == 0){
@@ -135,14 +137,15 @@ public class PgmCallRowFixture extends RowFixture {
 		
 		parmsInfo = setUpParameters();
 		dbConn = new CdsAS400Connection(dbFile);
-		
-		try {
-			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			parmsInfo.get(0).returnMessage = e1.toString();
-			return parmsInfo;
-		}
+
+//      This code was abstracted into CdsAS400Connection().		
+//		try {
+//			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
+//		} catch (Exception e1) {
+//			e1.printStackTrace();
+//			parmsInfo.get(0).returnMessage = e1.toString();
+//			return parmsInfo;
+//		}
 		AS400 serv = null;
 		try {
 			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
