@@ -48,24 +48,8 @@ public class DataQueueFixture extends SequenceFixture {
 			return "AS400 security exception @ getAS400()";
 		}
 		
-	//	Try to create a data queue java object
-	//	try{
-			dq = new DataQueue(serv, path);
-	//	} catch (AS400SecurityException e){
-	//		return "Security Exception caught at new DataQueue()";
-	//	} catch (ErrorCompletingRequestException e){
-	//		return "ErrorCompletingRequestException @ new dq()";
-	//	} catch (IOException e){
-	//		return "IOException @ new dq()";
-	//	} catch (IllegalObjectTypeException e){
-	//		return "IllegalObjectTypeException @ new dq()";
-	//	} catch (InterruptedException e){
-	//		return "InterruptedException @ new dq()";
-	//	} catch (ObjectAlreadyExistsException e){
-	//		return "ObjectAlreadyExistsException @ new dq()";
-	//	} catch (ObjectDoesNotExistException e){
-	//		return "ObjectDoesNotExistException @ new dq()";
-	//	}
+		dq = new DataQueue(serv, path);
+
        
 	//  Try to create the data queue on the iSeries using the java object
 		try {
@@ -239,6 +223,4 @@ public class DataQueueFixture extends SequenceFixture {
 			return "UnsupportedEncodingException @ receive.dqe.getString()";
 		}
 	}
-	
-
 }

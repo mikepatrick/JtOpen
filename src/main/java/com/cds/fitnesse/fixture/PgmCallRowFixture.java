@@ -30,7 +30,6 @@ public class PgmCallRowFixture extends RowFixture {
 	private static final String ZON = "ZON";
 	protected String applicationName = null;
 	protected Properties dbProperties = null;
-	private static final String url = "jdbc:as400://serv.cdsfulfillment.com/;user=WWWAUTOT;password=cds999;transaction isolation=none;errors=full;";
 	private CdsAS400Connection dbConn = null;
 	private String dbFile = "db.properties";
 	private ArrayList<parmInfo> parmsInfo = null;
@@ -125,7 +124,6 @@ public class PgmCallRowFixture extends RowFixture {
 	}
 	
 	public byte[] concatenateLinkparm(byte[] linkparm, int offset, ProgramParameter progParm){
-		int numBytes = progParm.getOutputDataLength();
 		byte[] thisparm = progParm.getInputData();
 		int parmSize = thisparm.length;
 		System.arraycopy(thisparm, 0, linkparm, offset, parmSize);
@@ -141,6 +139,7 @@ public class PgmCallRowFixture extends RowFixture {
 			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
 		} catch (Exception e1) {
 			e1.printStackTrace();
+			parmsInfo.get(0).returnMessage = e1.toString();
 			return parmsInfo;
 		}
 		AS400 serv = null;
@@ -148,9 +147,11 @@ public class PgmCallRowFixture extends RowFixture {
 			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		} catch (IOException e) {
 			e.printStackTrace();
+			parmsInfo.get(0).returnMessage = e.toString();
 			return parmsInfo;
 		} catch (AS400SecurityException e) {
 			e.printStackTrace();
+			parmsInfo.get(0).returnMessage = e.toString();
 			return parmsInfo;
 		}		
 		
@@ -184,12 +185,8 @@ public class PgmCallRowFixture extends RowFixture {
 	        { 	
 	        	if(singleLinkparm){
 	        		int linkparmOffset = 0;
-	        		int linkparmLength = parameterList[0].getOutputDataLength();
 	        		byte[] retLinkparm = parameterList[0].getOutputData();
-    				
-    				
-    				
-    				
+
 	        		for(int i = 0; i < parmsInfo.size(); i++){
 	        			if (parmsInfo.get(i).dataType.equals(CHAR)){
 	    					//AS400Text text = new AS400Text(parmsInfo.get(i).dataLength);
@@ -242,6 +239,7 @@ public class PgmCallRowFixture extends RowFixture {
 	    catch (Exception e)
 	    {
 	        System.out.println("Program " + pgm.getProgram() + " issued an exception!");
+	        parmsInfo.get(0).returnMessage = e.toString();
 	        e.printStackTrace();
 	        return parmsInfo;
 	    }
