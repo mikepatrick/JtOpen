@@ -124,6 +124,7 @@ public class PgmCallRowFixture extends RowFixture {
 	}
 	
 	public byte[] concatenateLinkparm(byte[] linkparm, int offset, ProgramParameter progParm){
+		
 		byte[] thisparm = progParm.getInputData();
 		int parmSize = thisparm.length;
 		System.arraycopy(thisparm, 0, linkparm, offset, parmSize);
@@ -133,8 +134,8 @@ public class PgmCallRowFixture extends RowFixture {
 	public ArrayList<parmInfo> runpgm() throws Exception  {
 		
 		parmsInfo = setUpParameters();
-		
 		dbConn = new CdsAS400Connection(dbFile);
+		
 		try {
 			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
 		} catch (Exception e1) {
@@ -156,42 +157,34 @@ public class PgmCallRowFixture extends RowFixture {
 		}		
 		
 	    ProgramCall pgm = new ProgramCall(serv);
+	    
 	    try
 	    {   
 	    	if(singleLinkparm){
 	    		parameterList = new ProgramParameter[1];
 	    		parameterList[0] = new ProgramParameter(linkparm, linkparm.length);
 	    	}
+	    	
 	        pgm.setProgram(qualifiedProgramName, parameterList);
 
 	        if (pgm.run() != true)
 	        {
-
 	            System.out.println("Program failed - pgm.run() did not return true");
 	            AS400Message[] messagelist = pgm.getMessageList();
 	         // for (int i = 0; i < messagelist.length; ++i)
 	            for(int i = 0; i < parmsInfo.size(); i++)
 	            {
-	                // Show each message.
 	                System.out.println(messagelist[i]);
-	         //     returnMsg = returnMsg.concat(messagelist[i].getText());
-	                parmsInfo.get(i).returnMessage = messagelist[i].getText();
-	                
+	                parmsInfo.get(i).returnMessage = messagelist[i].getText();    
 	            }
 	            return parmsInfo;
-	        }
-	        // Else no error, get output data.
-	        else
-	        { 	
+	        } else { 	
 	        	if(singleLinkparm){
 	        		int linkparmOffset = 0;
 	        		byte[] retLinkparm = parameterList[0].getOutputData();
 
 	        		for(int i = 0; i < parmsInfo.size(); i++){
 	        			if (parmsInfo.get(i).dataType.equals(CHAR)){
-	    					//AS400Text text = new AS400Text(parmsInfo.get(i).dataLength);
-	        				//parmsInfo.get(i).dataValue = ((String) text.toObject(parameterList[i].getOutputData()));
-	    					// linkparm work to do here to set outparm values
 	        				int numBytes = parmsInfo.get(i).byteLength;
 	        				byte[] thisparm = new byte[numBytes];
 	        				AS400Text text = new AS400Text(numBytes);
@@ -207,7 +200,6 @@ public class PgmCallRowFixture extends RowFixture {
 	    					AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
 	    					thisparm = Arrays.copyOfRange(retLinkparm, linkparmOffset, linkparmOffset + numBytes);
 	    					parmsInfo.get(i).dataValue = (((BigDecimal) decParm.toObject(thisparm)).toString());
-	    					//parmsInfo.get(i).dataValue = (((BigDecimal) decParm.toObject(parameterList[i].getOutputData())).toString());
 	    					linkparmOffset += numBytes;
 	    					
 	    				}
@@ -235,6 +227,7 @@ public class PgmCallRowFixture extends RowFixture {
 	    				}
 	    			}
 	        	}
+	        	serv.disconnectAllServices();
 	    		return parmsInfo;
 	        }
 	    }
@@ -244,10 +237,9 @@ public class PgmCallRowFixture extends RowFixture {
 	        parmsInfo.get(0).returnMessage = e.toString();
 	        e.printStackTrace();
 	        return parmsInfo;
-	    }
-	    // Done with the system.
-	    // serv.disconnectAllServices();		
+	    }	
 	}
+	
 	protected class parmInfo{
 		public String dataName;
 		public String dataType;
@@ -257,6 +249,7 @@ public class PgmCallRowFixture extends RowFixture {
 		public int byteLength;
 		public String returnMessage;
 		public byte[] storedParm;
+		
 		public parmInfo(String dataName, String dataType, String dataLength, String dataValue){
 			this.dataName = dataName;
 			this.dataType = dataType;
@@ -276,6 +269,7 @@ public class PgmCallRowFixture extends RowFixture {
 			this.dataValue = dataValue;
 		}
 	}
+	
 	@Override
 	public Class<?> getTargetClass() {
 		return parmInfo.class;
@@ -286,4 +280,3 @@ public class PgmCallRowFixture extends RowFixture {
 		return runpgm().toArray();
 	}
 }
-
