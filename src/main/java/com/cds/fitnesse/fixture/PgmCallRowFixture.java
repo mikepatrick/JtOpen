@@ -196,7 +196,9 @@ public class PgmCallRowFixture extends RowFixture {
 	        				byte[] thisparm = new byte[numBytes];
 	        				AS400Text text = new AS400Text(numBytes);
 	        				thisparm = Arrays.copyOfRange(retLinkparm, linkparmOffset, linkparmOffset + numBytes);
-	        				parmsInfo.get(i).dataValue = ((String) text.toObject(Arrays.copyOfRange(thisparm, 0, numBytes)));
+	        				String charParm = ((String) text.toObject(Arrays.copyOfRange(thisparm, 0, numBytes)));
+	        				//trim() to make validation in a RowFixture table simpler
+	        				parmsInfo.get(i).dataValue = charParm.trim();
 	        				linkparmOffset += numBytes;
 	    				}
 	    				if(parmsInfo.get(i).dataType.equals(NUM)){
