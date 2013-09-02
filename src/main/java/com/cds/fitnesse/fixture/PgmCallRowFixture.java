@@ -3,8 +3,6 @@ package com.cds.fitnesse.fixture;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
@@ -45,13 +43,6 @@ public class PgmCallRowFixture extends RowFixture {
 		return serv;
 	}
 
-//  This code was abstracted into CdsAS400Connection.
-//	private Connection getJDBCConnection(String driverName, String driverUrl, String userName, String password) throws Exception
-//	{
-//		//register the driver
-//		Class driverClass = Class.forName(driverName);
-//		return DriverManager.getConnection(driverUrl, userName, password);		  
-//	}
 	private ArrayList<parmInfo> setUpParameters() throws PropertyVetoException{
 		singleLinkparm = false;
 		if (args.length == 0){
@@ -138,14 +129,6 @@ public class PgmCallRowFixture extends RowFixture {
 		parmsInfo = setUpParameters();
 		dbConn = new CdsAS400Connection(dbFile);
 
-//      This code was abstracted into CdsAS400Connection().		
-//		try {
-//			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
-//		} catch (Exception e1) {
-//			e1.printStackTrace();
-//			parmsInfo.get(0).returnMessage = e1.toString();
-//			return parmsInfo;
-//		}
 		AS400 serv = null;
 		try {
 			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
