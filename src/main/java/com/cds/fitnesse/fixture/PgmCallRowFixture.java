@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
+import com.cds.fitnesse.utils.ParmInfo;
 
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Message;
@@ -30,7 +31,7 @@ public class PgmCallRowFixture extends RowFixture {
 	protected Properties dbProperties = null;
 	private CdsAS400Connection dbConn = null;
 	private String dbFile = "db.properties";
-	private ArrayList<parmInfo> parmsInfo = null;
+	private ArrayList<ParmInfo> parmsInfo = null;
 	private ProgramParameter[] parameterList = null;
 	private String qualifiedProgramName;
 	private byte[] linkparm;
@@ -43,7 +44,7 @@ public class PgmCallRowFixture extends RowFixture {
 		return serv;
 	}
 
-	private ArrayList<parmInfo> setUpParameters() throws PropertyVetoException{
+	private ArrayList<ParmInfo> setUpParameters() throws PropertyVetoException{
 		singleLinkparm = false;
 		if (args.length == 0){
 			return parmsInfo;
@@ -70,47 +71,47 @@ public class PgmCallRowFixture extends RowFixture {
 			singleLinkparm = true;
 		}
 		qualifiedProgramName = "/QSYS.LIB/".concat(libName).concat(".LIB/").concat(pgmName).concat(".PGM");
-		parmsInfo = new ArrayList<parmInfo>();
+		parmsInfo = new ArrayList<ParmInfo>();
 		
 		for(int i = 4; i < numCells; ){
-			parmsInfo.add(new parmInfo(args[i], args[i+1], args[i+2], args[i+3]));
+			parmsInfo.add(new ParmInfo(args[i], args[i+1], args[i+2], args[i+3]));
 			i = i+4;
 		}
         // Set up the parameters.
         parameterList = new ProgramParameter[parmsInfo.size()];
       		
 		for(int i = 0; i < parmsInfo.size(); i++){
-			parameterList[i] = new ProgramParameter(parmsInfo.get(i).dataLength);
-			if (parmsInfo.get(i).dataType.equals(CHAR)){
-		        AS400Text nametext = new AS400Text(parmsInfo.get(i).dataLength);
-		        parameterList[i] = new ProgramParameter(nametext.toBytes(parmsInfo.get(i).dataValue));
-		        parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);
+			parameterList[i] = new ProgramParameter(parmsInfo.get(i).getDataLength());
+			if (parmsInfo.get(i).getDataType().equals(CHAR)){
+		        AS400Text nametext = new AS400Text(parmsInfo.get(i).getDataLength());
+		        parameterList[i] = new ProgramParameter(nametext.toBytes(parmsInfo.get(i).getDataValue()));
+		        parameterList[i].setOutputDataLength(parmsInfo.get(i).getDataLength());
 		        linkparm = concatenateLinkparm(linkparm, lpIndex, parameterList[i]);
 		        lpIndex += parameterList[i].getInputData().length;
-		        parmsInfo.get(i).byteLength = parameterList[i].getInputData().length;
-		        parmsInfo.get(i).storedParm = new byte[parmsInfo.get(i).byteLength];
-		        parmsInfo.get(i).storedParm = parameterList[i].getInputData();
+		        parmsInfo.get(i).setByteLength(parameterList[i].getInputData().length);
+		        parmsInfo.get(i).setStoredParm(new byte[parmsInfo.get(i).getByteLength()]);
+		        parmsInfo.get(i).setStoredParm(parameterList[i].getInputData());
 		        
 			}
-			if(parmsInfo.get(i).dataType.equals(NUM)){
-				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
-				parameterList[i] = new ProgramParameter(decParm.toBytes(new BigDecimal(parmsInfo.get(i).dataValue)));
-				parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);
+			if(parmsInfo.get(i).getDataType().equals(NUM)){
+				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
+				parameterList[i] = new ProgramParameter(decParm.toBytes(new BigDecimal(parmsInfo.get(i).getDataValue())));
+				parameterList[i].setOutputDataLength(parmsInfo.get(i).getDataLength());
 				linkparm = concatenateLinkparm(linkparm, lpIndex, parameterList[i]);
 		        lpIndex += parameterList[i].getInputData().length;				
-		        parmsInfo.get(i).byteLength = parameterList[i].getInputData().length;
-		        parmsInfo.get(i).storedParm = new byte[parmsInfo.get(i).byteLength];
-		        parmsInfo.get(i).storedParm = parameterList[i].getInputData();
+		        parmsInfo.get(i).setByteLength(parameterList[i].getInputData().length);
+		        parmsInfo.get(i).setStoredParm(new byte[parmsInfo.get(i).getByteLength()]);
+		        parmsInfo.get(i).setStoredParm(parameterList[i].getInputData());
 			}
-			if(parmsInfo.get(i).dataType.equals(ZON)){
-				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
-				parameterList[i] = new ProgramParameter(zonParm.toBytes(new BigDecimal(parmsInfo.get(i).dataValue)));
-				parameterList[i].setOutputDataLength(parmsInfo.get(i).dataLength);
+			if(parmsInfo.get(i).getDataType().equals(ZON)){
+				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
+				parameterList[i] = new ProgramParameter(zonParm.toBytes(new BigDecimal(parmsInfo.get(i).getDataValue())));
+				parameterList[i].setOutputDataLength(parmsInfo.get(i).getDataLength());
 				linkparm = concatenateLinkparm(linkparm, lpIndex, parameterList[i]);
 		        lpIndex += parameterList[i].getInputData().length;		
-		        parmsInfo.get(i).byteLength = parameterList[i].getInputData().length;
-		        parmsInfo.get(i).storedParm = new byte[parmsInfo.get(i).byteLength];
-		        parmsInfo.get(i).storedParm = parameterList[i].getInputData();
+		        parmsInfo.get(i).setByteLength(parameterList[i].getInputData().length);
+		        parmsInfo.get(i).setStoredParm(new byte[parmsInfo.get(i).getByteLength()]);
+		        parmsInfo.get(i).setStoredParm(parameterList[i].getInputData());
 			}
 		}		
 		return parmsInfo;
@@ -124,7 +125,7 @@ public class PgmCallRowFixture extends RowFixture {
 		
 		return linkparm;
 	}
-	public ArrayList<parmInfo> runpgm() throws Exception  {
+	public ArrayList<ParmInfo> runpgm() throws Exception  {
 		
 		parmsInfo = setUpParameters();
 		dbConn = new CdsAS400Connection(dbFile);
@@ -134,11 +135,11 @@ public class PgmCallRowFixture extends RowFixture {
 			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		} catch (IOException e) {
 			e.printStackTrace();
-			parmsInfo.get(0).returnMessage = e.toString();
+			parmsInfo.get(0).setReturnMessage(e.toString());
 			return parmsInfo;
 		} catch (AS400SecurityException e) {
 			e.printStackTrace();
-			parmsInfo.get(0).returnMessage = e.toString();
+			parmsInfo.get(0).setReturnMessage(e.toString());
 			return parmsInfo;
 		}		
 		
@@ -161,7 +162,7 @@ public class PgmCallRowFixture extends RowFixture {
 	            for(int i = 0; i < parmsInfo.size(); i++)
 	            {
 	                System.out.println(messagelist[i]);
-	                parmsInfo.get(i).returnMessage = messagelist[i].getText();    
+	                parmsInfo.get(i).setReturnMessage(messagelist[i].getText());    
 	            }
 	            return parmsInfo;
 	        } else { 	
@@ -170,46 +171,47 @@ public class PgmCallRowFixture extends RowFixture {
 	        		byte[] retLinkparm = parameterList[0].getOutputData();
 
 	        		for(int i = 0; i < parmsInfo.size(); i++){
-	        			if (parmsInfo.get(i).dataType.equals(CHAR)){
-	        				int numBytes = parmsInfo.get(i).byteLength;
+	        			if (parmsInfo.get(i).getDataType().equals(CHAR)){
+	        				int numBytes = parmsInfo.get(i).getByteLength();
 	        				byte[] thisparm = new byte[numBytes];
 	        				AS400Text text = new AS400Text(numBytes);
 	        				thisparm = Arrays.copyOfRange(retLinkparm, linkparmOffset, linkparmOffset + numBytes);
 	        				String charParm = ((String) text.toObject(Arrays.copyOfRange(thisparm, 0, numBytes)));
 	        				//trim() to make validation in a RowFixture table simpler
-	        				parmsInfo.get(i).dataValue = charParm.trim();
+	        				parmsInfo.get(i).setDataValue(charParm.trim());
 	        				linkparmOffset += numBytes;
 	    				}
-	    				if(parmsInfo.get(i).dataType.equals(NUM)){
-	        				int numBytes = parmsInfo.get(i).byteLength;
+	    				if(parmsInfo.get(i).getDataType().equals(NUM)){
+	        				int numBytes = parmsInfo.get(i).getByteLength();
 	        				byte[] thisparm = new byte[numBytes];	    					
-	    					AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
+	    					AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
 	    					thisparm = Arrays.copyOfRange(retLinkparm, linkparmOffset, linkparmOffset + numBytes);
-	    					parmsInfo.get(i).dataValue = (((BigDecimal) decParm.toObject(thisparm)).toString());
+	    					parmsInfo.get(i).setDataValue((((BigDecimal) decParm.toObject(thisparm)).toString()));
 	    					linkparmOffset += numBytes;
 	    					
 	    				}
-	    				if(parmsInfo.get(i).dataType.equals(ZON)){
-	        				int numBytes = parmsInfo.get(i).byteLength;
+	    				if(parmsInfo.get(i).getDataType().equals(ZON)){
+	        				int numBytes = parmsInfo.get(i).getByteLength();
 	        				byte[] thisparm = new byte[numBytes];	    					
-	    					AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
+	    					AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
 	    					thisparm = Arrays.copyOfRange(retLinkparm, linkparmOffset, linkparmOffset + numBytes);
-	    					parmsInfo.get(i).dataValue = (((BigDecimal) zonParm.toObject(thisparm)).toString());
+	    					parmsInfo.get(i).setDataValue((((BigDecimal) zonParm.toObject(thisparm)).toString()));
 	    					linkparmOffset += numBytes;
 	    				}	        			
 	        		}
 	        	}else{
 	        		for(int i = 0; i < parmsInfo.size(); i++){
-	        			if (parmsInfo.get(i).dataType.equals(CHAR)){
-	    					AS400Text text = new AS400Text(parmsInfo.get(i).dataLength);parmsInfo.get(i).dataValue = ((String) text.toObject(parameterList[i].getOutputData()));
+	        			if (parmsInfo.get(i).getDataType().equals(CHAR)){
+	    					AS400Text text = new AS400Text(parmsInfo.get(i).getDataLength());
+	    					parmsInfo.get(i).setDataValue(((String) text.toObject(parameterList[i].getOutputData())));
 	    				}
-	    				if(parmsInfo.get(i).dataType.equals(NUM)){
-	    					AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
-	    					parmsInfo.get(i).dataValue = (((BigDecimal) decParm.toObject(parameterList[i].getOutputData())).toString());
+	    				if(parmsInfo.get(i).getDataType().equals(NUM)){
+	    					AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
+	    					parmsInfo.get(i).setDataValue((((BigDecimal) decParm.toObject(parameterList[i].getOutputData())).toString()));
 	    				}
-	    				if(parmsInfo.get(i).dataType.equals(ZON)){
-	    					AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).dataLength, parmsInfo.get(i).decimalLength);
-	    					parmsInfo.get(i).dataValue = (((BigDecimal) zonParm.toObject(parameterList[i].getOutputData())).toString());
+	    				if(parmsInfo.get(i).getDataType().equals(ZON)){
+	    					AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
+	    					parmsInfo.get(i).setDataValue((((BigDecimal) zonParm.toObject(parameterList[i].getOutputData())).toString()));
 	    				}
 	    			}
 	        	}
@@ -220,13 +222,13 @@ public class PgmCallRowFixture extends RowFixture {
 	    catch (Exception e)
 	    {
 	        System.out.println("Program " + pgm.getProgram() + " issued an exception!");
-	        parmsInfo.get(0).returnMessage = e.toString();
+	        parmsInfo.get(0).setReturnMessage(e.toString());
 	        e.printStackTrace();
 	        return parmsInfo;
 	    }	
 	}
 	
-	protected class parmInfo{
+/*	protected class parmInfo{
 		public String dataName;
 		public String dataType;
 		public int dataLength;
@@ -254,11 +256,11 @@ public class PgmCallRowFixture extends RowFixture {
 
 			this.dataValue = dataValue;
 		}
-	}
+	}*/
 	
 	@Override
 	public Class<?> getTargetClass() {
-		return parmInfo.class;
+		return ParmInfo.class;
 	}
 
 	  @Override

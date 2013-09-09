@@ -13,8 +13,9 @@ import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.CommandCall;
 
 import fitlibrary.DoFixture;
+import fitlibrary.SequenceFixture;
 
-public class CmdCallFixture extends DoFixture {
+public class CmdCallFixture extends SequenceFixture {
 
 	private static final String SERV = "SERV";
 	protected String applicationName = null;

@@ -11,7 +11,7 @@ public class SbmJobFixture extends CmdCallFixture{
 		public String jobUser;
 		
 	}
-	public String prepareSbmJob() throws Exception{
+	public String submitJob() throws Exception{
 		if (args.length == 0){
 			return "No arguments passed";
 		}
@@ -29,14 +29,15 @@ public class SbmJobFixture extends CmdCallFixture{
 		
 		// Get qualified job name here for job log retrieval
 		String qualifiedJobName = getJobDetails(returnValue);
-		String parts[] = qualifiedJobName.split("/");
+		/*String parts[] = qualifiedJobName.split("/");
 		
 		String jobNumber = parts[0];
 		String jobUser = parts[1];
 		String jobName = parts[2];
-		
+		*/
 
-		return returnValue;
+		//return returnValue;
+		return qualifiedJobName;
 		
 		
 	}
