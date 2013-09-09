@@ -31,7 +31,9 @@ public class CmdCallFixture extends DoFixture {
 		return serv;
 	}
 	
-	private Connection getJDBCConnection(String driverName, String driverUrl, String userName, String password) throws Exception
+	// Made this public so SbmJobFixture could inherit it.
+	// Move this into a utility class that both fixtures can import.
+	public Connection getJDBCConnection(String driverName, String driverUrl, String userName, String password) throws Exception
 	{
 		Class driverClass = Class.forName(driverName);
 		return DriverManager.getConnection(driverUrl, userName, password);		  
@@ -57,7 +59,7 @@ public class CmdCallFixture extends DoFixture {
 			return "Could not create AS400 object @ getAS400() - AS400SecurityException";
 		}		
 		CommandCall cmd = new CommandCall(serv, command);
-		
+		 
 		try{
 		
 			if (cmd.run() != true){
