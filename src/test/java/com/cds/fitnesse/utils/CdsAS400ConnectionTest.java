@@ -1,7 +1,5 @@
 package com.cds.fitnesse.utils;
 
-import com.cds.fitnesse.fixture.CmdCallFixtureTest;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -75,4 +73,4 @@ public class CdsAS400ConnectionTest extends TestCase{
     	assertEquals("url", "http://google.com", con.setDataSource(emptyString));
     	assertEquals("url", "http://google.com", con.getDataSource());
     }     
-}
+} 

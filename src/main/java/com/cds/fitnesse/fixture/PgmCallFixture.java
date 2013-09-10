@@ -118,25 +118,16 @@ public class PgmCallFixture extends SequenceFixture {
 	        // Run the program.
 	        if (pgm.run() != true)
 	        {
-	            // Report failure.
 	            System.out.println("Program failed - pgm.run() did not return true");
-	            // Show the messages.
 	            returnMsg = "";
 	            AS400Message[] messagelist = pgm.getMessageList();
 	            for (int i = 0; i < messagelist.length; ++i)
 	            {
-	                // Show each message.
 	                System.out.println(messagelist[i]);
-	                returnMsg = returnMsg.concat(messagelist[i].getText());
-	                
+	                returnMsg = returnMsg.concat(messagelist[i].getText());     
 	            }
 	            return returnMsg;
-	        }
-	        // Else no error, get output data.
-	        else
-	        { 
-	        	
-	        	
+	        } else {	
 	    		for(int i = 0; i < parmsInfo.size(); i++){
 	    			
 	    			if (parmsInfo.get(i).getDataType().equals(CHAR)){
@@ -144,21 +135,22 @@ public class PgmCallFixture extends SequenceFixture {
 	    		        returnMsg = returnMsg.concat(parmsInfo.get(i).getDataName()).concat(": ");
 	    		        returnMsg = returnMsg.concat((String) text.toObject(parameterList[i].getOutputData()));
 	    		        returnMsg = returnMsg.concat(", ");
-	    			}
-	    			if(parmsInfo.get(i).getDataType().equals(NUM)){
-	    				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
-	    				returnMsg = returnMsg.concat(parmsInfo.get(i).getDataName()).concat(": ");
-	    				returnMsg = returnMsg.concat(((BigDecimal) decParm.toObject(parameterList[i].getOutputData())).toString());
-	    				returnMsg = returnMsg.concat(", ");
-	    			}
-	    			if(parmsInfo.get(i).getDataType().equals(ZON)){
-	    				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
-	    				returnMsg = returnMsg.concat(parmsInfo.get(i).getDataName()).concat(": ");
-	    				returnMsg = returnMsg.concat(((BigDecimal) zonParm.toObject(parameterList[i].getOutputData())).toString());
-	    				returnMsg = returnMsg.concat(", ");	    				
+	    			}else{
+	    				if(parmsInfo.get(i).getDataType().equals(NUM)){
+	    					AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
+	    					returnMsg = returnMsg.concat(parmsInfo.get(i).getDataName()).concat(": ");
+	    					returnMsg = returnMsg.concat(((BigDecimal) decParm.toObject(parameterList[i].getOutputData())).toString());
+	    					returnMsg = returnMsg.concat(", ");
+	    				}else{
+	    					if(parmsInfo.get(i).getDataType().equals(ZON)){
+	    						AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
+	    						returnMsg = returnMsg.concat(parmsInfo.get(i).getDataName()).concat(": ");
+	    						returnMsg = returnMsg.concat(((BigDecimal) zonParm.toObject(parameterList[i].getOutputData())).toString());
+	    						returnMsg = returnMsg.concat(", ");
+	    					}
+	    				}
 	    			}	    			
-	    		}	        	
-	 
+	    		}
 	            return returnMsg;
 	        }
 	    }

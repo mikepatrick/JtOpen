@@ -19,6 +19,7 @@ public class SbmJobFixture extends CmdCallFixture{
 			return "Not enough arguments found";
 		}
 		
+		//Location of the job card
 		String cardLib = args[0];
 		String cardFile = args[1];
 		String cardMember = args[2];
