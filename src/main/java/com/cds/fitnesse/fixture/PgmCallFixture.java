@@ -38,13 +38,6 @@ public class PgmCallFixture extends SequenceFixture {
 		return serv;
 	}
 	
-//	private Connection getJDBCConnection(String driverName, String driverUrl, String userName, String password) throws Exception
-//	{
-//		Class driverClass = Class.forName(driverName);
-//		return DriverManager.getConnection(driverUrl, userName, password);		  
-//	}
-
-	
 	public String runpgm() throws Exception  {
 		if (args.length == 0){
 			return "No arguments passed";
@@ -80,26 +73,23 @@ public class PgmCallFixture extends SequenceFixture {
 		        AS400Text nametext = new AS400Text(parmsInfo.get(i).getDataLength());
 		        parameterList[i] = new ProgramParameter(nametext.toBytes(parmsInfo.get(i).getDataValue()));
 		        parameterList[i].setOutputDataLength(parmsInfo.get(i).getDataLength());
+			}else{
+				if(parmsInfo.get(i).getDataType().equals(NUM)){
+					AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
+					parameterList[i] = new ProgramParameter(decParm.toBytes(new BigDecimal(parmsInfo.get(i).getDataValue())));
+					parameterList[i].setOutputDataLength(parmsInfo.get(i).getDataLength());
+				}else{
+					if(parmsInfo.get(i).getDataType().equals(ZON)){
+						AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
+						parameterList[i] = new ProgramParameter(zonParm.toBytes(new BigDecimal(parmsInfo.get(i).getDataValue())));
+						parameterList[i].setOutputDataLength(parmsInfo.get(i).getDataLength());				
+					}
+				}
 			}
-			if(parmsInfo.get(i).getDataType().equals(NUM)){
-				AS400PackedDecimal decParm = new AS400PackedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
-				parameterList[i] = new ProgramParameter(decParm.toBytes(new BigDecimal(parmsInfo.get(i).getDataValue())));
-				parameterList[i].setOutputDataLength(parmsInfo.get(i).getDataLength());
-			}
-			if(parmsInfo.get(i).getDataType().equals(ZON)){
-				AS400ZonedDecimal zonParm = new AS400ZonedDecimal(parmsInfo.get(i).getDataLength(), parmsInfo.get(i).getDecimalLength());
-				parameterList[i] = new ProgramParameter(zonParm.toBytes(new BigDecimal(parmsInfo.get(i).getDataValue())));
-				parameterList[i].setOutputDataLength(parmsInfo.get(i).getDataLength());				
-			}			
 		}
 		
 		dbConn = new CdsAS400Connection(dbFile);
-//		try {
-//			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
-//		} catch (Exception e1) {
-//			e1.printStackTrace();
-//			return "Obtaining Connection failed @ getJDBCConnection()";
-//		}
+
 		AS400 serv = null;
 		try {
 			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
@@ -161,31 +151,9 @@ public class PgmCallFixture extends SequenceFixture {
 	        return "Program " + pgm.getProgram() + " issued an exception!";
 	        
 	    }
+	    // Does this need to live above the return statement?
 	    // Done with the system.
 	    // serv.disconnectAllServices();		
 	}
-/*	protected class parmInfo{
-		public String dataName;
-		public String dataType;
-		public int dataLength;
-		public String dataValue;
-		public int decimalLength;
-		public parmInfo(String dataName, String dataType, String dataLength, String dataValue){
-			this.dataName = dataName;
-			this.dataType = dataType;
-			if (dataLength.contains(",")){
-				String[] splitLength = dataLength.split(",");
-				String totalLength = splitLength[0];
-				String decimalLength = splitLength[1];
-				this.dataLength = Integer.parseInt(totalLength);
-				this.decimalLength = Integer.parseInt(decimalLength);
-			}else{
-				this.dataLength = Integer.parseInt(dataLength);
-				this.decimalLength = 0;
-			}
-
-			this.dataValue = dataValue;
-		}
-	}*/
 }
 

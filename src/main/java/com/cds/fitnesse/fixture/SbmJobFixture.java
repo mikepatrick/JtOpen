@@ -39,8 +39,6 @@ public class SbmJobFixture extends CmdCallFixture{
 
 		//return returnValue;
 		return qualifiedJobName;
-		
-		
 	}
 	
 	public String getJobLog(){
@@ -68,8 +66,7 @@ public class SbmJobFixture extends CmdCallFixture{
 	     			fullJobName = s.next();	
 	     		}else{
 	     			return "Could not parse job name - ".concat(fullMessage);
-	     		}
-	    		 
+	     		} 
 	     }else{
 	    	 return "Could not parse job name - ".concat(fullMessage);
 		 }

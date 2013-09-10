@@ -1,7 +1,5 @@
 package com.cds.fitnesse.fixture;
 
-import com.cds.fitnesse.utils.CdsAS400Connection;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;

@@ -12,7 +12,7 @@ public class CdsAS400Connection {
 		this.getDbProperties(filename);
 	}
 	/**
-	 * Gets the dbunit properties that are used to load data for each row.
+	 * Gets the properties that are used to connect to the 400.
 	 * 
 	 * @return Properties
 	 * 
