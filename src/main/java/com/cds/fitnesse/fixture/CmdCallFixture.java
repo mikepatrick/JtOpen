@@ -2,17 +2,19 @@ package com.cds.fitnesse.fixture;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
+import com.cds.fitnesse.utils.CommandExecution;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.CommandCall;
 
-import fitlibrary.SequenceFixture;
+import fit.RowFixture;
 
-public class CmdCallFixture extends SequenceFixture {
+public class CmdCallFixture extends RowFixture {
 
 	private static final String SERV = "SERV";
 	protected String applicationName = null;
@@ -27,15 +29,21 @@ public class CmdCallFixture extends SequenceFixture {
 		return serv;
 	}
 	
-	public String runcmd(String command) throws Exception  {
+	public ArrayList<CommandExecution> runcmd(String command) throws Exception  {
 
 		dbConn = new CdsAS400Connection(dbFile);
 		AS400 serv = null;
+		ArrayList<CommandExecution> thisCall = new ArrayList<CommandExecution>();
+		thisCall.add(new CommandExecution());
+		thisCall.get(0).setCmd(command);
+		//thisCall[0].setCmd(command);
+		
 		try {
 			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());			
 		} catch (AS400SecurityException e) {
 			e.printStackTrace();
-			return "Could not create AS400 object @ getAS400() - AS400SecurityException";
+			thisCall.get(0).setCmd("Could not create AS400 object @ getAS400() - AS400SecurityException");
+			return thisCall; 
 		}		
 		CommandCall cmd = new CommandCall(serv, command);
 		 
@@ -51,13 +59,18 @@ public class CmdCallFixture extends SequenceFixture {
 				System.out.println(messagelist[i].getText());
 				returnMsg = returnMsg.concat(messagelist[i].getText());
 			}	 
-			return returnMsg;
+			thisCall.get(0).setReturnMsg(returnMsg);
+			thisCall.get(0).setCmd(command);
+			return thisCall;
 		}
 		catch (Exception e)
 		{
 	        System.out.println("Command " + cmd.getCommand() + " issued an exception!");
-	        e.printStackTrace();	
-	        return "Command failed";
+	        e.printStackTrace();
+	        
+	        returnMsg = "Command failed";
+	        thisCall.get(0).setReturnMsg(returnMsg);
+	        return thisCall;
 		}			
 	}
 	public String loginUserPassword(String dataSource, String userName, String password){
@@ -73,12 +86,24 @@ public class CmdCallFixture extends SequenceFixture {
 			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		} catch (IOException e) {
 			e.printStackTrace();
-			return "Could not create AS400 object @ getAS400() - IOException";
+		//	return "Could not create AS400 object @ getAS400() - IOException";
 		} catch (AS400SecurityException e) {
 			e.printStackTrace();
 			return "Could not create AS400 object @ GETas400() - AS400SecurityException";
 		}				
 		return "Credentials changed";
+	}
+
+	@Override
+	public Class<?> getTargetClass() {
+		
+		return CommandExecution.class;
+	}
+
+	@Override
+	public Object[] query() throws Exception {
+		
+		return runcmd(args[0]).toArray();
 	}
 	
 }
