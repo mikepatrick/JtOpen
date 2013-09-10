@@ -23,6 +23,8 @@ import com.ibm.as400.access.RequestNotSupportedException;
 import com.ibm.as400.access.SpooledFile;
 import com.ibm.as400.access.SpooledFileList;
 
+import fit.Fixture;
+
 public class SbmJobFixture extends CmdCallFixture{
 
 	private String parts[];
@@ -32,12 +34,18 @@ public class SbmJobFixture extends CmdCallFixture{
 	private static final String SERV = "SERV";	
 	private String dbFile = "db.properties";
 	
-	public String submitJob() throws Exception{
+	public ArrayList<CommandExecution> submitJob() throws Exception{
+		ArrayList<CommandExecution> returnVal = new ArrayList<CommandExecution>();
+		returnVal.add(new CommandExecution());
+		
 		if (args.length == 0){
-			return "No arguments passed";
+			
+			returnVal.get(0).setReturnMsg("No arguments passed");
+			return returnVal;
 		}
 		if (args.length < 3){
-			return "Not enough arguments found";
+			returnVal.get(0).setReturnMsg("Not enough arguments found");
+			return returnVal;
 		}
 		
 		//Location of the job card
@@ -46,14 +54,21 @@ public class SbmJobFixture extends CmdCallFixture{
 		String cardMember = args[2];
 		
 		String command = constructCommand(cardLib, cardFile, cardMember);
-		
+		returnVal.get(0).setCmd(command);
 		ArrayList<CommandExecution> cmdRan = new ArrayList<CommandExecution>();
 		cmdRan = runcmd(command);
-		String returnValue = cmdRan.get(0).getReturnMsg();
+		String retmsg = cmdRan.get(0).getReturnMsg();
+		String retAbbrMsg = getJobDetails(retmsg);
+		returnVal.get(0).setReturnMsg(getJobDetails(retmsg));
+		Fixture.setSymbol("qualJobName", retAbbrMsg);
+		return returnVal;
+		
+/*		String returnValue = cmdRan.get(0).getReturnMsg();
 		// Get qualified job name here for job log retrieval
 		String qualifiedJobName = getJobDetails(returnValue);
 		if (!qualifiedJobName.contains("/")){
-			return "Could not parse job name";
+			returnVal.get(0).setReturnMsg("Could not parse job name");
+			return returnVal;
 		}
 		parts = qualifiedJobName.split("/");
 		
@@ -62,7 +77,8 @@ public class SbmJobFixture extends CmdCallFixture{
 		jobName = parts[2];
 
 		//return returnValue;
-		return qualifiedJobName;
+		return returnVal;
+		*/
 	}
 	
 	public String[] getJobLog() throws AS400SecurityException, ErrorCompletingRequestException, InterruptedException, IOException, ObjectDoesNotExistException{
@@ -117,6 +133,12 @@ public class SbmJobFixture extends CmdCallFixture{
 			e.printStackTrace();
 		}				
 		SpooledFileList spoolList = new SpooledFileList(serv);
+		Object fullJob = Fixture.getSymbol("qualJobName");
+		String fullJobName = (String) fullJob;
+		parts = fullJobName.split("/");
+		jobNumber = parts[0];
+		jobUser = parts[1];
+		jobName = parts[2];
 		
 		spoolList.setUserDataFilter(jobName);
 		spoolList.openSynchronously();
@@ -177,5 +199,9 @@ public class SbmJobFixture extends CmdCallFixture{
 		 }
 	     return fullJobName;
 	}
-
+	@Override
+	public Object[] query() throws Exception {
+		
+		return submitJob().toArray();
+	}
 }
