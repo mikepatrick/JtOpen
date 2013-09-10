@@ -3,13 +3,12 @@ package com.cds.fitnesse.fixture;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.Properties;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
 import com.cds.fitnesse.utils.ParmInfo;
+
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.AS400PackedDecimal;
@@ -27,7 +26,6 @@ public class PgmCallFixture extends SequenceFixture {
 	private static final String CHAR = "CHAR";
 	private static final String NUM = "NUM";
 	private static final String ZON = "ZON";
-	protected String applicationName = null;
 	protected Properties dbProperties = null;
 	private CdsAS400Connection dbConn = null;
 	private String returnMsg = "";
@@ -40,11 +38,11 @@ public class PgmCallFixture extends SequenceFixture {
 		return serv;
 	}
 	
-	private Connection getJDBCConnection(String driverName, String driverUrl, String userName, String password) throws Exception
-	{
-		Class driverClass = Class.forName(driverName);
-		return DriverManager.getConnection(driverUrl, userName, password);		  
-	}
+//	private Connection getJDBCConnection(String driverName, String driverUrl, String userName, String password) throws Exception
+//	{
+//		Class driverClass = Class.forName(driverName);
+//		return DriverManager.getConnection(driverUrl, userName, password);		  
+//	}
 
 	
 	public String runpgm() throws Exception  {
@@ -96,12 +94,12 @@ public class PgmCallFixture extends SequenceFixture {
 		}
 		
 		dbConn = new CdsAS400Connection(dbFile);
-		try {
-			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			return "Obtaining Connection failed @ getJDBCConnection()";
-		}
+//		try {
+//			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
+//		} catch (Exception e1) {
+//			e1.printStackTrace();
+//			return "Obtaining Connection failed @ getJDBCConnection()";
+//		}
 		AS400 serv = null;
 		try {
 			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());

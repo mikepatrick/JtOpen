@@ -168,7 +168,7 @@ public class PgmCallRowFixture extends RowFixture {
 	        {
 	            System.out.println("Program failed - pgm.run() did not return true");
 	            AS400Message[] messagelist = pgm.getMessageList();
-	         // for (int i = 0; i < messagelist.length; ++i)
+
 	            for(int i = 0; i < parmsInfo.size(); i++)
 	            {
 	                System.out.println(messagelist[i]);
