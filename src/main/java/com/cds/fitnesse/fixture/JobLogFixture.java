@@ -1,7 +1,9 @@
 package com.cds.fitnesse.fixture;
 
 import java.beans.PropertyVetoException;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -70,25 +72,37 @@ public class JobLogFixture extends RowFixture{
 				if(splf.getName().equals("QPJOBLOG")){
 					PrintParameterList pParms = new PrintParameterList();
 		//			pParms.setParameter(SpooledFile.ATTR_MFGTYPE, "*WSCST");
-		//			pParms.setParameter(SpooledFile.ATTR_WORKSTATION_CUST_OBJECT, "/QSYS.LIB/QWPDEFAULT.WSCST");					
+					pParms.setParameter(SpooledFile.ATTR_WORKSTATION_CUST_OBJECT, "/QSYS.LIB/QWPDEFAULT.WSCST");					
+		//			pParms.setParameter(SpooledFile.ATTR_SCS2ASCII, "*YES");
 					is = splf.getInputStream(pParms);
+	//				BufferedReader buf = new BufferedReader(new InputStreamReader(is));
+					
+	//				String thisLine = "";
+	//				while((thisLine = buf.readLine()) != null){
+	//					logMsgs.add(thisLine);
+	//				}
+					
 					int numBytes = is.available();
 					byte byteJar[] = new byte[132];
 					for(int j = 0; j < numBytes; j+=132){
 						int numLeft = is.available();
-						if (numLeft >= 132){
+						if (numLeft < 132){
 							txt = new AS400Text(numLeft);
 							byteJar = new byte[numLeft];
 						}else{
 							txt = new AS400Text(132);
 							byteJar = new byte[132];
 						}
-				//		}else{
+		//		}else{
 				//			txt = new AS400Text(numLeft);
 				//		}
 						is.read(byteJar);
-				//		String logline = (String) txt.toObject(byteJar);
-						String logline = new String(byteJar, "CP037");
+						String logline = ((String) txt.toObject(byteJar)).trim();
+				//      String logline2 = Arrays.toString(byteJar);
+						String logline3 = new String(byteJar, "CP037");
+						String logline4 = new String(byteJar, "ASCII");
+						
+				//		String logline4 = new String(byteJar, "IBM0037");
 				//		String logline = Arrays.toString(byteJar);
 						logMsgs.add(logline);
 					}
