@@ -9,11 +9,14 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
+import com.cds.fitnesse.utils.SpooledFileListing;
 import com.cds.fitnesse.utils.SubmittedJob;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Exception;
+import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.AS400Text;
+import com.ibm.as400.access.CommandCall;
 import com.ibm.as400.access.ConnectionDroppedException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
 import com.ibm.as400.access.PrintObjectInputStream;
@@ -40,7 +43,7 @@ public class JobLogFixture extends RowFixture{
 		return serv;
 	}
 	
-	private ArrayList<String> getSpooledJobLog() throws PropertyVetoException, AS400Exception, ConnectionDroppedException, AS400SecurityException, ErrorCompletingRequestException, InterruptedException, IOException, RequestNotSupportedException{
+	private ArrayList<SpooledFileListing> getSpooledJobLog() throws PropertyVetoException, AS400Exception, ConnectionDroppedException, AS400SecurityException, ErrorCompletingRequestException, InterruptedException, IOException, RequestNotSupportedException{
 		AS400 serv = null;
 		CdsAS400Connection dbConn = new CdsAS400Connection(dbFile);
 		String fullJobName = (String) Fixture.getSymbol("qualJobName");
@@ -60,20 +63,45 @@ public class JobLogFixture extends RowFixture{
 		jobUser = parts[1];
 		jobName = parts[2];
 		
-		spoolList.setUserDataFilter(jobName);
+		Thread.sleep(5000);
+//		spoolList.setUserDataFilter(jobName);
+		spoolList.setUserFilter(jobUser);
 		spoolList.openSynchronously();
 		int numSpooledFiles = spoolList.size();
 		AS400Text txt = null;
-		ArrayList<String> logMsgs = new ArrayList<String>();
+		ArrayList<SpooledFileListing> logMsgs = new ArrayList<SpooledFileListing>();
 		PrintObjectInputStream is = null;
+		
 		for(int i = 0; i < numSpooledFiles; i++){
 			SpooledFile splf = (SpooledFile) spoolList.getObject(i);
 			if(splf.getJobName().equals(jobName) && splf.getJobNumber().equals(jobNumber)){
+				logMsgs.add(new SpooledFileListing("File: ".concat(splf.getName())));
 				if(splf.getName().equals("QPJOBLOG")){
-					PrintParameterList pParms = new PrintParameterList();
+					//Get the hard coded library (and file?) name out fo this command.
+					String copyCommand = "CPYSPLF FILE(QPJOBLOG) TOFILE(MPATRICK/JOBLOGPF) JOB(".concat(fullJobName).concat(") SPLNBR(*ANY) MBROPT(*REPLACE)");
+					CommandCall cpyCmd = new CommandCall(serv, copyCommand);
+					if(cpyCmd.run() != true){
+						//TODO;
+						;
+					}else{
+						AS400Message[] messagelist = cpyCmd.getMessageList();
+						
+						for (int j = 0; j < messagelist.length; ++j){
+			        
+							System.out.println(messagelist[j].getText());
+							logMsgs.add(new SpooledFileListing((messagelist[j].getText())));
+						}	 						
+						logMsgs.add(new SpooledFileListing("Job log copied to JOBLOGPF"));
+					}
+				}
+			}
+		}
+			
+	//				return logMsgs;
+	/*				PrintParameterList pParms = new PrintParameterList();
 		//			pParms.setParameter(SpooledFile.ATTR_MFGTYPE, "*WSCST");
 					pParms.setParameter(SpooledFile.ATTR_WORKSTATION_CUST_OBJECT, "/QSYS.LIB/QWPDEFAULT.WSCST");					
-		//			pParms.setParameter(SpooledFile.ATTR_SCS2ASCII, "*YES");
+					pParms.setParameter(SpooledFile.ATTR_SCS2ASCII, "*YES");
 					is = splf.getInputStream(pParms);
 	//				BufferedReader buf = new BufferedReader(new InputStreamReader(is));
 					
@@ -109,7 +137,7 @@ public class JobLogFixture extends RowFixture{
 					
 				}
 			}
-		}
+		}*/
 		return logMsgs;
 //		SpooledFile spooledLog = createSpooledFile();
 	}	
@@ -135,7 +163,7 @@ public class JobLogFixture extends RowFixture{
 	@Override
 	public Class<?> getTargetClass() {
 		
-		return String.class;
+		return SpooledFileListing.class;
 	}
 
 	@Override
