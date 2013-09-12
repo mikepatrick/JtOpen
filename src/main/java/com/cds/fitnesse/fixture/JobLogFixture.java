@@ -1,26 +1,26 @@
 package com.cds.fitnesse.fixture;
 
 import java.beans.PropertyVetoException;
-import java.io.BufferedReader;
+//import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+//import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
+//import java.util.Arrays;
+//import java.util.Scanner;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
 import com.cds.fitnesse.utils.SpooledFileListing;
-import com.cds.fitnesse.utils.SubmittedJob;
+//import com.cds.fitnesse.utils.SubmittedJob;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Exception;
 import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.AS400SecurityException;
-import com.ibm.as400.access.AS400Text;
+//import com.ibm.as400.access.AS400Text;
 import com.ibm.as400.access.CommandCall;
 import com.ibm.as400.access.ConnectionDroppedException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
-import com.ibm.as400.access.PrintObjectInputStream;
-import com.ibm.as400.access.PrintParameterList;
+//import com.ibm.as400.access.PrintObjectInputStream;
+//import com.ibm.as400.access.PrintParameterList;
 import com.ibm.as400.access.RequestNotSupportedException;
 import com.ibm.as400.access.SpooledFile;
 import com.ibm.as400.access.SpooledFileList;
@@ -68,9 +68,9 @@ public class JobLogFixture extends RowFixture{
 		spoolList.setUserFilter(jobUser);
 		spoolList.openSynchronously();
 		int numSpooledFiles = spoolList.size();
-		AS400Text txt = null;
+//		AS400Text txt = null;
 		ArrayList<SpooledFileListing> logMsgs = new ArrayList<SpooledFileListing>();
-		PrintObjectInputStream is = null;
+//		PrintObjectInputStream is = null;
 		
 		for(int i = 0; i < numSpooledFiles; i++){
 			SpooledFile splf = (SpooledFile) spoolList.getObject(i);
@@ -142,7 +142,7 @@ public class JobLogFixture extends RowFixture{
 //		SpooledFile spooledLog = createSpooledFile();
 	}	
 	
-	private String getJobDetails(String fullMessage){
+/*	private String getJobDetails(String fullMessage){
 		 String firstToken = "";
 		 String fullJobName = "";
 		 Scanner s = new Scanner(fullMessage);
@@ -159,7 +159,7 @@ public class JobLogFixture extends RowFixture{
 	    	 return "Could not parse job name - ".concat(fullMessage);
 		 }
 	     return fullJobName;
-	}	
+	}	*/
 	@Override
 	public Class<?> getTargetClass() {
 		
