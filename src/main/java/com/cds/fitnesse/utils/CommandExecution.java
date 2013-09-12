@@ -13,6 +13,10 @@ public class CommandExecution {
 	public CommandExecution(String cmd){
 		this.cmdToRun = cmd;
 	}
+	public CommandExecution(String cmd, String rtnMsg){
+		this.cmdToRun = cmd;
+		this.returnMsg = rtnMsg;
+	}
 	public String getCmd() {
 		return cmdToRun;
 	}
