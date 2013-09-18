@@ -8,10 +8,10 @@
 <target name="init">
 <tstamp/>
 <mkdir dir="${build}"/>
-</target>
+</target> 
 
 <target name="compile" depends="init">
-<javac srcdir="${src}" destdir="${build}" debug="on"/>
+<javac source="1.5" target="1.5" srcdir="${src}" destdir="${build}" debug="on"/>
 </target>
 
   <target name="dist" depends="compile"
