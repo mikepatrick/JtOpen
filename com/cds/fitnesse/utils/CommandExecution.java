@@ -3,8 +3,8 @@ package com.cds.fitnesse.utils;
 public class CommandExecution {
 
 
-	public String cmdToRun;
-	public String returnMsg;
+	private String cmdToRun;
+	private String returnMsg;
 	
 	public CommandExecution(){
 		this.cmdToRun = "";

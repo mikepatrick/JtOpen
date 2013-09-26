@@ -151,7 +151,6 @@ public class PgmCallFixture extends SequenceFixture {
 	        return "Program " + pgm.getProgram() + " issued an exception!";
 	        
 	    }
-	    // Does this need to live above the return statement?
 	    // Done with the system.
 	    // serv.disconnectAllServices();		
 	}

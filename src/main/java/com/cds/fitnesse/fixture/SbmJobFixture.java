@@ -62,23 +62,6 @@ public class SbmJobFixture extends CmdCallFixture{
 		returnVal.get(0).setReturnMsg(getJobDetails(retmsg));
 		Fixture.setSymbol("qualJobName", retAbbrMsg);
 		return returnVal;
-		
-/*		String returnValue = cmdRan.get(0).getReturnMsg();
-		// Get qualified job name here for job log retrieval
-		String qualifiedJobName = getJobDetails(returnValue);
-		if (!qualifiedJobName.contains("/")){
-			returnVal.get(0).setReturnMsg("Could not parse job name");
-			return returnVal;
-		}
-		parts = qualifiedJobName.split("/");
-		
-		jobNumber = parts[0];
-		jobUser = parts[1];
-		jobName = parts[2];
-
-		//return returnValue;
-		return returnVal;
-		*/
 	}
 	
 	public String[] getJobLog() throws AS400SecurityException, ErrorCompletingRequestException, InterruptedException, IOException, ObjectDoesNotExistException{

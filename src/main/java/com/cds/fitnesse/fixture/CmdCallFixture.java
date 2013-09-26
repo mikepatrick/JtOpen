@@ -36,7 +36,6 @@ public class CmdCallFixture extends RowFixture {
 		ArrayList<CommandExecution> thisCall = new ArrayList<CommandExecution>();
 		thisCall.add(new CommandExecution());
 		thisCall.get(0).setCmd(command);
-		//thisCall[0].setCmd(command);
 		
 		try {
 			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());			
