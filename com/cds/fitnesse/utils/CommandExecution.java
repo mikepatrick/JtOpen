@@ -17,11 +17,11 @@ public class CommandExecution {
 		this.cmdToRun = cmd;
 		this.returnMsg = rtnMsg;
 	}
-	public String getCmd() {
+	public String getCmdToRun() {
 		return cmdToRun;
 	}
 
-	public void setCmd(String cmd) {
+	public void setCmdToRun(String cmd) {
 		this.cmdToRun = cmd;
 	}
 

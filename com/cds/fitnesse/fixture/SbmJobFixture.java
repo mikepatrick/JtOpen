@@ -22,6 +22,7 @@ import com.ibm.as400.access.QueuedMessage;
 import com.ibm.as400.access.RequestNotSupportedException;
 import com.ibm.as400.access.SpooledFile;
 import com.ibm.as400.access.SpooledFileList;
+//import static com.cds.fitnesse.fixture.CmdCallFixture.*;
 
 import fit.Fixture;
 
@@ -32,6 +33,7 @@ public class SbmJobFixture extends CmdCallFixture{
 	private String jobNumber;
 	private String jobUser;
 	private static final String SERV = "SERV.cdsfulfillment.com";	
+	
 	private String dbFile = "db.properties";
 	
 	public ArrayList<CommandExecution> submitJob() throws Exception{
@@ -54,10 +56,15 @@ public class SbmJobFixture extends CmdCallFixture{
 		String cardMember = args[2];
 		
 		String command = constructCommand(cardLib, cardFile, cardMember);
-		returnVal.get(0).setCmd(command);
+		returnVal.get(0).setCmdToRun(command);
 		ArrayList<CommandExecution> cmdRan = new ArrayList<CommandExecution>();
 		cmdRan = runcmd(command);
-		String retmsg = cmdRan.get(0).getReturnMsg();
+		String retmsg = cmdRan.get(1).getReturnMsg();
+//		for(CommmandExecution ce : cmdRan){
+		for(int i=0; i < cmdRan.size(); i++){
+			System.out.println(cmdRan.get(i).getCmdToRun());
+			System.out.println(cmdRan.get(i).getReturnMsg());
+		}
 		String retAbbrMsg = getJobDetails(retmsg);
 		returnVal.get(0).setReturnMsg(getJobDetails(retmsg));
 		Fixture.setSymbol("qualJobName", retAbbrMsg);
@@ -192,10 +199,10 @@ public class SbmJobFixture extends CmdCallFixture{
 	     		if (s.hasNext()){
 	     			fullJobName = s.next();	
 	     		}else{
-	     			return "Could not parse job name - ".concat(fullMessage);
+	     			return "Could not parse job name - not enouth tokens - ".concat(fullMessage);
 	     		} 
 	     }else{
-	    	 return "Could not parse job name - ".concat(fullMessage);
+	    	 return "Could not parse job name - Wrong first token".concat(fullMessage);
 		 }
 	     return fullJobName;
 	}

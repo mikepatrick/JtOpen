@@ -110,5 +110,12 @@ public class CmdCallSequenceFixture extends SequenceFixture {
 		
 		return "Credentials changed";
 	}
-
+	public String waitForXseconds(int seconds){
+		try {
+			Thread.sleep(seconds * 1000);
+		}catch(Exception e){
+			return "not ok";
+		}
+		return "ok";
+	}
 }
