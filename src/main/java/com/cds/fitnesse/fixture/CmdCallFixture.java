@@ -15,7 +15,11 @@ import com.ibm.as400.access.CommandCall;
 import fit.RowFixture;
 
 public class CmdCallFixture extends RowFixture {
-
+	/*
+	 * A RowFixture expects an ArrayList of elements to be returned from a query() method.
+	 * This fixture returns an ArrayList of CommandExecution objects.
+	 * 
+	 */
 	private static final String SERV = "SERV";
 	protected String applicationName = null;
 	protected Properties dbProperties = null;
@@ -73,6 +77,11 @@ public class CmdCallFixture extends RowFixture {
 	        return thisCall;
 		}			
 	}
+	
+	/*
+	 * This method has not been fully implemented.  The idea was to allow a test table
+	 * to establish a different set of credentials for connecting to the 400.
+	 */
 	public String loginUserPassword(String dataSource, String userName, String password){
 		
 		if (!(dataSource.isEmpty())){
