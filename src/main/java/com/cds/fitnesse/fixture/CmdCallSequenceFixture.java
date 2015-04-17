@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
+import com.cds.fitnesse.utils.CdsFixtureUtils;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.AS400SecurityException;
@@ -20,25 +21,15 @@ public class CmdCallSequenceFixture extends SequenceFixture {
 	private CdsAS400Connection dbConn = null;
 	private String returnMsg = "";
 	private String dbFile = "db.properties";
-	private AS400 serv = null;
-	
-	public AS400 getAS400(String sys, String user, String password) throws IOException, AS400SecurityException {
-		serv = new AS400(sys, user, password);
-		serv.connectService(AS400.COMMAND);
-		return serv;
-	}
+	private AS400 serv;
 
 	public String runcmd(String command) throws Exception  {
 
 		dbConn = new CdsAS400Connection(dbFile);
 
 		AS400 serv = null;
-		try {
-			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());			
-		} catch (AS400SecurityException e) {
-			e.printStackTrace();
-			return "Could not create AS400 object @ getAS400() - AS400SecurityException";
-		}		
+		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
+		
 		CommandCall cmd = new CommandCall(serv, command);
 
 		try{
@@ -74,16 +65,7 @@ public class CmdCallSequenceFixture extends SequenceFixture {
 		this.dbConn.setUser(userName);
 		this.dbConn.setPassword(password);		
 
-		serv = null;
-		try {
-			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return "Could not create AS400 object @ getAS400() - IOException";
-		} catch (AS400SecurityException e) {
-			e.printStackTrace();
-			return "Could not create AS400 object @ GETas400() - AS400SecurityException";
-		}	
+		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		
 		return "Credentials changed";
 	}

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
+import com.cds.fitnesse.utils.CdsFixtureUtils;
 import com.cds.fitnesse.utils.CommandExecution;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Message;
@@ -27,12 +28,6 @@ public class CmdCallFixture extends RowFixture {
 	private String returnMsg = "";
 	private String dbFile = "db.properties";
 	
-	public AS400 getAS400(String sys, String user, String password) throws IOException, AS400SecurityException {
-		AS400 serv = new AS400(sys, user, password);
-		serv.connectService(AS400.COMMAND);
-		return serv;
-	}
-	
 	public ArrayList<CommandExecution> runcmd(String command) throws Exception  {
 
 		dbConn = new CdsAS400Connection(dbFile);
@@ -41,13 +36,7 @@ public class CmdCallFixture extends RowFixture {
 		thisCall.add(new CommandExecution());
 		thisCall.get(0).setCmd(command);
 		
-		try {
-			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());			
-		} catch (AS400SecurityException e) {
-			e.printStackTrace();
-			thisCall.get(0).setCmd("Could not create AS400 object @ getAS400() - AS400SecurityException");
-			return thisCall; 
-		}		
+		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());			
 		CommandCall cmd = new CommandCall(serv, command);
 		 
 		try{
@@ -90,16 +79,7 @@ public class CmdCallFixture extends RowFixture {
 		this.dbConn.setUser(userName);
 		this.dbConn.setPassword(password);
 		dbConn = new CdsAS400Connection(dbFile);
-		AS400 serv = null;
-		try {
-			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
-		} catch (IOException e) {
-			e.printStackTrace();
-		//	return "Could not create AS400 object @ getAS400() - IOException";
-		} catch (AS400SecurityException e) {
-			e.printStackTrace();
-			return "Could not create AS400 object @ GETas400() - AS400SecurityException";
-		}				
+		AS400 serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		return "Credentials changed";
 	}
 

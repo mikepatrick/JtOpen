@@ -6,12 +6,13 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
+import com.cds.fitnesse.utils.CdsFixtureUtils;
 import com.cds.fitnesse.utils.CommandExecution;
+import com.cds.fitnesse.utils.SubmittedJob;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Exception;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.AS400Text;
-import com.ibm.as400.access.ConnectionDroppedException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
 import com.ibm.as400.access.Job;
 import com.ibm.as400.access.JobLog;
@@ -27,25 +28,22 @@ import fit.Fixture;
 
 public class SbmJobFixture extends CmdCallFixture{
 
-	private String parts[];
-	private String jobName;
-	private String jobNumber;
-	private String jobUser;
+	private SubmittedJob theJob;
 	private static final String SERV = "SERV";	
 	private String dbFile = "db.properties";
 	
 	public ArrayList<CommandExecution> submitJob() throws Exception{
-		ArrayList<CommandExecution> returnVal = new ArrayList<CommandExecution>();
-		returnVal.add(new CommandExecution());
+		ArrayList<CommandExecution> commandToExecute = new ArrayList<CommandExecution>();
+		commandToExecute.add(new CommandExecution());
 		
 		if (args.length == 0){
 			
-			returnVal.get(0).setReturnMsg("No arguments passed");
-			return returnVal;
+			commandToExecute.get(0).setReturnMsg("No arguments passed");
+			return commandToExecute;
 		}
 		if (args.length < 3){
-			returnVal.get(0).setReturnMsg("Not enough arguments found");
-			return returnVal;
+			commandToExecute.get(0).setReturnMsg("Not enough arguments found");
+			return commandToExecute;
 		}
 		
 		//Location of the job card
@@ -54,32 +52,27 @@ public class SbmJobFixture extends CmdCallFixture{
 		String cardMember = args[2];
 		
 		String command = constructCommand(cardLib, cardFile, cardMember);
-		returnVal.get(0).setCmd(command);
+		commandToExecute.get(0).setCmd(command);
 		ArrayList<CommandExecution> cmdRan = new ArrayList<CommandExecution>();
 		cmdRan = runcmd(command);
 		String retmsg = cmdRan.get(0).getReturnMsg();
 		String retAbbrMsg = getJobDetails(retmsg);
-		returnVal.get(0).setReturnMsg(getJobDetails(retmsg));
+		commandToExecute.get(0).setReturnMsg(getJobDetails(retmsg));
 		Fixture.setSymbol("qualJobName", retAbbrMsg);
-		return returnVal;
+		return commandToExecute;
 	}
 	
 	public String[] getJobLog() throws AS400SecurityException, ErrorCompletingRequestException, InterruptedException, IOException, ObjectDoesNotExistException{
 		AS400 serv = null;
 		CdsAS400Connection dbConn = new CdsAS400Connection(dbFile);
 		
-		try {
-			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (AS400SecurityException e) {
-			e.printStackTrace();
-		}			
-		if(jobName == null){
+		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
+		
+		if(theJob == null || theJob.getJobNumber() == null){
 			String returnVal[] = {"Job not set"};
 			return returnVal;
 		}
-		Job job = new Job(serv, jobName, jobUser, jobNumber);
+		Job job = new Job(serv, theJob.getJobName(), theJob.getJobUser(), theJob.getJobNumber());
 		job.loadInformation();
 		
 		int numloops = 0;
@@ -104,26 +97,18 @@ public class SbmJobFixture extends CmdCallFixture{
 		return returnVal;
 	}
 	
-	private ArrayList<String> getSpooledJobLog() throws PropertyVetoException, AS400Exception, ConnectionDroppedException, AS400SecurityException, ErrorCompletingRequestException, InterruptedException, IOException, RequestNotSupportedException{
+	private ArrayList<String> getSpooledJobLog() throws PropertyVetoException, AS400Exception, ErrorCompletingRequestException, InterruptedException, RequestNotSupportedException, AS400SecurityException, IOException{
 		AS400 serv = null;
 		CdsAS400Connection dbConn = new CdsAS400Connection(dbFile);
 		
-		try {
-			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (AS400SecurityException e) {
-			e.printStackTrace();
-		}				
+		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
+			
 		SpooledFileList spoolList = new SpooledFileList(serv);
 		Object fullJob = Fixture.getSymbol("qualJobName");
 		String fullJobName = (String) fullJob;
-		parts = fullJobName.split("/");
-		jobNumber = parts[0];
-		jobUser = parts[1];
-		jobName = parts[2];
+		theJob = CdsFixtureUtils.parseJobName(fullJobName);
 		
-		spoolList.setUserDataFilter(jobName);
+		spoolList.setUserDataFilter(theJob.getJobName());
 		spoolList.openSynchronously();
 		int numSpooledFiles = spoolList.size();
 		AS400Text txt = null;
@@ -131,7 +116,7 @@ public class SbmJobFixture extends CmdCallFixture{
 		PrintObjectInputStream is = null;
 		for(int i = 0; i < numSpooledFiles; i++){
 			SpooledFile splf = (SpooledFile) spoolList.getObject(i);
-			if(splf.getJobName().equals(jobName) && splf.getJobNumber().equals(jobNumber)){
+			if(splf.getJobName().equals(theJob.getJobName()) && splf.getJobNumber().equals(theJob.getJobNumber())){
 				if(splf.getName().equals("QPJOBLOG")){
 					PrintParameterList pParms = new PrintParameterList();
 					is = splf.getInputStream(pParms);

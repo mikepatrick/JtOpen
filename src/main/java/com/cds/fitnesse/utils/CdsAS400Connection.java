@@ -24,10 +24,7 @@ public class CdsAS400Connection {
 			try {	
 				this.dbProperties.load(new FileInputStream(filename) );
 			} catch (IOException e) {
-			//	this.dbProperties = null;
-			//	return this.dbProperties;
-				return null;
-				//throw new Exception("Couldn't find dbUnit properties file.");
+				e.printStackTrace();
 			}
 		}
 		return this.dbProperties;

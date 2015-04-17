@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
+import com.cds.fitnesse.utils.CdsFixtureUtils;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.AS400PackedDecimal;
@@ -39,12 +40,6 @@ public class PgmCallArrayFixture extends ArrayFixture {
 	public PgmCallArrayFixture () throws Exception{
 		super.getArgs();
 		parmsInfo = runpgm();
-	}
-	public AS400 getAS400(String sys, String user, String password) throws IOException, AS400SecurityException {
-		AS400 serv = new AS400(sys, user, password);
-		serv.connectService(AS400.COMMAND);
-		
-		return serv;
 	}
 	
 	private Connection getJDBCConnection(String driverName, String driverUrl, String userName, String password) throws Exception
@@ -109,15 +104,7 @@ public class PgmCallArrayFixture extends ArrayFixture {
 			return parmsInfo;
 		}
 		AS400 serv = null;
-		try {
-			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return parmsInfo;
-		} catch (AS400SecurityException e) {
-			e.printStackTrace();
-			return parmsInfo;
-		}		
+		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		
 	    ProgramCall pgm = new ProgramCall(serv);
 	    try

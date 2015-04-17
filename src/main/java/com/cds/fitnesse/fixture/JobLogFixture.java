@@ -7,9 +7,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 //import java.util.Arrays;
 //import java.util.Scanner;
+import java.util.List;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
+import com.cds.fitnesse.utils.CdsFixtureUtils;
 import com.cds.fitnesse.utils.SpooledFileListing;
+import com.cds.fitnesse.utils.SubmittedJob;
 //import com.cds.fitnesse.utils.SubmittedJob;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Exception;
@@ -25,6 +28,7 @@ import com.ibm.as400.access.RequestNotSupportedException;
 import com.ibm.as400.access.SpooledFile;
 import com.ibm.as400.access.SpooledFileList;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import fit.Fixture;
 import fit.RowFixture;
 
@@ -32,65 +36,48 @@ public class JobLogFixture extends RowFixture{
 
 	private static final String SERV = "SERV";
 	private String dbFile = "db.properties";
-	private String parts[];
-	private String jobName;
-	private String jobNumber;
-	private String jobUser;
-	
-	public AS400 getAS400(String sys, String user, String password) throws IOException, AS400SecurityException {
-		AS400 serv = new AS400(sys, user, password);
-		serv.connectService(AS400.COMMAND);
-		return serv;
-	}
+	private SubmittedJob theJob;
 	
 	private ArrayList<SpooledFileListing> getSpooledJobLog() throws PropertyVetoException, AS400Exception, ConnectionDroppedException, AS400SecurityException, ErrorCompletingRequestException, InterruptedException, IOException, RequestNotSupportedException{
 		AS400 serv = null;
 		CdsAS400Connection dbConn = new CdsAS400Connection(dbFile);
 		String fullJobName = (String) Fixture.getSymbol("qualJobName");
 		
-		try {
-			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (AS400SecurityException e) {
-			e.printStackTrace();
-		}				
+		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
+		
 		SpooledFileList spoolList = new SpooledFileList(serv);
-		//String fullReturnMessage = args[0];
-		//if fullReturnMessage does not contain /, do something else
-		parts = fullJobName.split("/");
-		jobNumber = parts[0];
-		jobUser = parts[1];
-		jobName = parts[2];
+		theJob = CdsFixtureUtils.parseJobName(fullJobName);
 		
 		Thread.sleep(5000);
 //		spoolList.setUserDataFilter(jobName);
-		spoolList.setUserFilter(jobUser);
+		spoolList.setUserFilter(theJob.getJobUser());
 		spoolList.openSynchronously();
 		int numSpooledFiles = spoolList.size();
-//		AS400Text txt = null;
 		ArrayList<SpooledFileListing> logMsgs = new ArrayList<SpooledFileListing>();
-//		PrintObjectInputStream is = null;
 		
 		for(int i = 0; i < numSpooledFiles; i++){
 			SpooledFile splf = (SpooledFile) spoolList.getObject(i);
-			if(splf.getJobName().equals(jobName) && splf.getJobNumber().equals(jobNumber)){
+			if(splf.getJobName().equals(theJob.getJobName()) && splf.getJobNumber().equals(theJob.getJobNumber())){
 				logMsgs.add(new SpooledFileListing("File: ".concat(splf.getName())));
 				if(splf.getName().equals("QPJOBLOG")){
-					//Get the hard coded library (and file?) name out fo this command.
+					//Get the hard coded library (and file?) name out of this command.
 					String copyCommand = "CPYSPLF FILE(QPJOBLOG) TOFILE(MPATRICK/JOBLOGPF) JOB(".concat(fullJobName).concat(") SPLNBR(*ANY) MBROPT(*REPLACE)");
 					CommandCall cpyCmd = new CommandCall(serv, copyCommand);
-					if(cpyCmd.run() != true){
+					if(cpyCmd.run() != true)
+					{
 						//TODO;
 						;
-					}else{
-						AS400Message[] messagelist = cpyCmd.getMessageList();
+					}
+					else
+					{
+						List<AS400Message> mlist = Arrays.asList(cpyCmd.getMessageList());
 						
-						for (int j = 0; j < messagelist.length; ++j){
-			        
-							System.out.println(messagelist[j].getText());
-							logMsgs.add(new SpooledFileListing((messagelist[j].getText())));
-						}	 						
+						for (AS400Message message: mlist)
+						{
+							System.out.println(message.getText());
+							logMsgs.add(new SpooledFileListing(message.getText()));
+						}
+						
 						logMsgs.add(new SpooledFileListing("Job log copied to JOBLOGPF"));
 					}
 				}
