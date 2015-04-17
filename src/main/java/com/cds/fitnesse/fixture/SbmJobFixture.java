@@ -25,12 +25,11 @@ import com.ibm.as400.access.SpooledFile;
 import com.ibm.as400.access.SpooledFileList;
 
 import fit.Fixture;
+import static com.cds.fitnesse.utils.CdsFixtureUtils.*;
 
 public class SbmJobFixture extends CmdCallFixture{
 
 	private SubmittedJob theJob;
-	private static final String SERV = "SERV";	
-	private String dbFile = "db.properties";
 	
 	public ArrayList<CommandExecution> submitJob() throws Exception{
 		ArrayList<CommandExecution> commandToExecute = new ArrayList<CommandExecution>();
@@ -64,7 +63,7 @@ public class SbmJobFixture extends CmdCallFixture{
 	
 	public String[] getJobLog() throws AS400SecurityException, ErrorCompletingRequestException, InterruptedException, IOException, ObjectDoesNotExistException{
 		AS400 serv = null;
-		CdsAS400Connection dbConn = new CdsAS400Connection(dbFile);
+		CdsAS400Connection dbConn = new CdsAS400Connection(DB_PROPS_FILE);
 		
 		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		
@@ -79,8 +78,7 @@ public class SbmJobFixture extends CmdCallFixture{
 		while(!job.getStatus().equals(job.JOB_STATUS_OUTQ)){
 			Thread.sleep(2000);
 			job.loadInformation();
-			numloops++;
-			if (numloops > 10){
+			if (++numloops > 10){
 				break;
 			}
 		}
@@ -98,22 +96,20 @@ public class SbmJobFixture extends CmdCallFixture{
 	}
 	
 	private ArrayList<String> getSpooledJobLog() throws PropertyVetoException, AS400Exception, ErrorCompletingRequestException, InterruptedException, RequestNotSupportedException, AS400SecurityException, IOException{
-		AS400 serv = null;
-		CdsAS400Connection dbConn = new CdsAS400Connection(dbFile);
-		
-		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
+		CdsAS400Connection dbConn = new CdsAS400Connection(DB_PROPS_FILE);
+		AS400 serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 			
-		SpooledFileList spoolList = new SpooledFileList(serv);
-		Object fullJob = Fixture.getSymbol("qualJobName");
-		String fullJobName = (String) fullJob;
-		theJob = CdsFixtureUtils.parseJobName(fullJobName);
+		theJob = CdsFixtureUtils.parseJobName((String) Fixture.getSymbol("qualJobName"));
 		
+		SpooledFileList spoolList = new SpooledFileList(serv);
 		spoolList.setUserDataFilter(theJob.getJobName());
 		spoolList.openSynchronously();
 		int numSpooledFiles = spoolList.size();
+		
 		AS400Text txt = null;
 		ArrayList<String> logMsgs = new ArrayList<String>();
 		PrintObjectInputStream is = null;
+		
 		for(int i = 0; i < numSpooledFiles; i++){
 			SpooledFile splf = (SpooledFile) spoolList.getObject(i);
 			if(splf.getJobName().equals(theJob.getJobName()) && splf.getJobNumber().equals(theJob.getJobNumber())){
@@ -133,7 +129,6 @@ public class SbmJobFixture extends CmdCallFixture{
 						String logline = (String) txt.toObject(byteJar);
 						logMsgs.add(logline);
 					}
-					
 				}
 			}
 		}
@@ -142,12 +137,14 @@ public class SbmJobFixture extends CmdCallFixture{
 	}
 	
 	private String constructCommand(String cardLib, String cardFile, String cardMember){
-		String result = "";
-		result = result.concat("SBMDBJOB FILE(");
-		result = result.concat(cardLib).concat("/").concat(cardFile).concat(") ");
-		result = result.concat("MBR(").concat(cardMember).concat(")");
-		
-		return result;
+		StringBuilder sb = new StringBuilder();
+		sb.append("SBMDBJOB FILE(").append(cardLib).append("/").append(cardFile).append(") ").append("MBR(").append(cardMember).append(")");
+		return sb.toString();
+//		result = result.concat("SBMDBJOB FILE(");
+//		result = result.concat(cardLib).concat("/").concat(cardFile).concat(") ");
+//		result = result.concat("MBR(").concat(cardMember).concat(")");
+//		
+//		return result;
 	}
 	private String getJobDetails(String fullMessage){
 		 String firstToken = "";

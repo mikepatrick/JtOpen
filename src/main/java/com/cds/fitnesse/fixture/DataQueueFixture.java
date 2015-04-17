@@ -14,46 +14,25 @@ import com.ibm.as400.access.IllegalObjectTypeException;
 import com.ibm.as400.access.ObjectAlreadyExistsException;
 import com.ibm.as400.access.ObjectDoesNotExistException;
 import fitlibrary.SequenceFixture;
+import static com.cds.fitnesse.utils.CdsFixtureUtils.*;
 
 public class DataQueueFixture extends SequenceFixture {
 
-	private String dbFile = "db.properties";
 	private CdsAS400Connection dbConn = null;
-	private static final String SERV = "SERV";
 	private DataQueue dq = null;
 	
-	public AS400 getAS400(String sys, String user, String password) throws IOException, AS400SecurityException {
-		
-		AS400 serv = new AS400(sys, user, password);
-		serv.connectService(AS400.DATAQUEUE);
-		return serv;
-	}
 	private String getPath(String lib, String qName){
-		String returnVal = "";
-		returnVal = returnVal.concat("/QSYS.LIB/").concat(lib).concat(".LIB/").concat(qName).concat(".DTAQ");
-		return returnVal;
+//		returnVal = returnVal.concat("/QSYS.LIB/").concat(lib).concat(".LIB/").concat(qName).concat(".DTAQ");
+		return "".concat("/QSYS.LIB/").concat(lib).concat(".LIB/").concat(qName).concat(".DTAQ");
 	}
 	public String create(String lib, String dtaq) {
-		dbConn = new CdsAS400Connection(dbFile);
-		AS400 serv;
-		String path = getPath(lib, dtaq);
 		
-		try {
-			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return "IO Exception @ getAS400()";
-		} catch (AS400SecurityException e1) {
-			e1.printStackTrace();
-			return "AS400 security exception @ getAS400()";
-		}
-		
-		dq = new DataQueue(serv, path);
-
+		dbConn = new CdsAS400Connection(DB_PROPS_FILE);
+		AS400 serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword(), AS400.DATAQUEUE);
+		dq = new DataQueue(serv, getPath(lib, dtaq));
        
-	//  Try to create the data queue on the iSeries using the java object
 		try {
-			dq.create(400);
+			dq.create(MAX_DQ_ENTRY_SIZE);
 		} catch (ErrorCompletingRequestException e) {
 			e.printStackTrace();
 			return "ErrorCompletingRequestException @ dq.create()";
@@ -62,7 +41,7 @@ public class DataQueueFixture extends SequenceFixture {
 			return "InterruptedException @ dq.create()";
 		} catch (ObjectAlreadyExistsException e) {
 			e.printStackTrace();
-			return "OjbectAlreadyExistsException @ dq.create()";
+			return "ObjectAlreadyExistsException @ dq.create()";
 		} catch (ObjectDoesNotExistException e) {
 			e.printStackTrace();
 			return "ObjectDoesNotExistException @ dq.create()";
@@ -78,20 +57,10 @@ public class DataQueueFixture extends SequenceFixture {
 	}
 	
 	public String send(String lib, String dtaq, String data){
-		dbConn = new CdsAS400Connection(dbFile);
-		AS400 serv;
-		try {
-			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return "IO Exception @ getAS400()";
-		} catch (AS400SecurityException e1) {
-			e1.printStackTrace();
-			return "AS400 security exception @ getAS400()";
-		}
+		dbConn = new CdsAS400Connection(DB_PROPS_FILE);
+		AS400 serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword(), AS400.DATAQUEUE);
 
-		String path = getPath(lib, dtaq);
-		dq = new DataQueue(serv, path);		
+		dq = new DataQueue(serv, getPath(lib, dtaq));		
 		
 		//TODO get the 500 byte hard coding out of here
 		AS400Text textBytes = new AS400Text(data.length());
@@ -123,21 +92,9 @@ public class DataQueueFixture extends SequenceFixture {
 	}
 	public String peek(String lib, String dtaq){
 		
-		dbConn = new CdsAS400Connection(dbFile);
-		AS400 serv;
-		
-		try {
-			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return "IO Exception @ getAS400()";
-		} catch (AS400SecurityException e1) {
-			e1.printStackTrace();
-			return "AS400 security exception @ getAS400()";
-		}
-		
-		String path = getPath(lib, dtaq);
-		dq = new DataQueue(serv, path);		
+		dbConn = new CdsAS400Connection(DB_PROPS_FILE);
+		AS400 serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword(), AS400.DATAQUEUE);
+		dq = new DataQueue(serv, getPath(lib, dtaq));		
 		DataQueueEntry dqe = null;
 		
 		try {
@@ -174,21 +131,9 @@ public class DataQueueFixture extends SequenceFixture {
 	
 	public String receive(String lib, String dtaq){
 		
-		dbConn = new CdsAS400Connection(dbFile);
-		AS400 serv;
-		
-		try {
-			serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return "IO Exception @ getAS400()";
-		} catch (AS400SecurityException e1) {
-			e1.printStackTrace();
-			return "AS400 security exception @ getAS400()";
-		}
-		
-		String path = getPath(lib, dtaq);
-		dq = new DataQueue(serv, path);		
+		dbConn = new CdsAS400Connection(DB_PROPS_FILE);
+		AS400 serv = getAS400(SERV, dbConn.getUser(), dbConn.getPassword(), AS400.DATAQUEUE);
+		dq = new DataQueue(serv, getPath(lib, dtaq));		
 		DataQueueEntry dqe = null;
 		
 		try {

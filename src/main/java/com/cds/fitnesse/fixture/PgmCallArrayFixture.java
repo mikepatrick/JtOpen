@@ -20,19 +20,16 @@ import com.ibm.as400.access.ProgramCall;
 import com.ibm.as400.access.ProgramParameter;
 
 import fitlibrary.ArrayFixture;
+import static com.cds.fitnesse.utils.CdsFixtureUtils.*;
 
 public class PgmCallArrayFixture extends ArrayFixture {
  
-	private static final String SERV = "SERV";
-	private static final String CHAR = "CHAR";
-	private static final String NUM = "NUM";
-	protected String applicationName = null;
-	protected Properties dbProperties = null;
+//	protected String applicationName = null;
+//	protected Properties dbProperties = null;
 	private static final String url = "jdbc:as400://serv.cdsfulfillment.com/;user=WWWAUTOT;password=cds999;transaction isolation=none;errors=full;";
 	//private static final String driverName = "com.ibm.as400.access.AS400JDBCDriver";
 	private CdsAS400Connection dbConn = null;
-	private String returnMsg = "";
-	private String dbFile = "db.properties";
+	//private String returnMsg = "";
 	private ArrayList<parmInfo> parmsInfo = null;
 	private ProgramParameter[] parameterList = null;
 	private String qualifiedProgramName;
@@ -96,7 +93,7 @@ public class PgmCallArrayFixture extends ArrayFixture {
 		
 		parmsInfo = setUpParameters();
 		
-		dbConn = new CdsAS400Connection(dbFile);
+		dbConn = new CdsAS400Connection(DB_PROPS_FILE);
 		try {
 			Connection conn = getJDBCConnection(dbConn.getDriverName(), dbConn.getDataSource(), dbConn.getUser(), dbConn.getPassword());
 		} catch (Exception e1) {
@@ -116,7 +113,7 @@ public class PgmCallArrayFixture extends ArrayFixture {
 	            // Report failure.
 	            System.out.println("Program failed - pgm.run() did not return true");
 	            // Show the messages.
-	            returnMsg = "";
+	            String returnMsg = "";
 	            AS400Message[] messagelist = pgm.getMessageList();
 	            for (int i = 0; i < messagelist.length; ++i)
 	            {

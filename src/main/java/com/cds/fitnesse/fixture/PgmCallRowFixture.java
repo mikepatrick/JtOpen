@@ -20,6 +20,7 @@ import com.ibm.as400.access.ProgramCall;
 import com.ibm.as400.access.ProgramParameter;
 
 import fit.RowFixture;
+import static com.cds.fitnesse.utils.CdsFixtureUtils.*;
 
 public class PgmCallRowFixture extends RowFixture {
  
@@ -33,11 +34,9 @@ public class PgmCallRowFixture extends RowFixture {
 			return this.dType;
 		}
 	}
-	private static final String SERV = "SERV";
-	protected String applicationName = null;
-	protected Properties dbProperties = null;
+	//protected String applicationName = null;
+	//protected Properties dbProperties = null;
 	private CdsAS400Connection dbConn = null;
-	private String dbFile = "db.properties";
 	private ArrayList<ParmInfo> parmsInfo = null;
 	private ProgramParameter[] parameterList = null;
 	private String qualifiedProgramName;
@@ -130,7 +129,7 @@ public class PgmCallRowFixture extends RowFixture {
 	public ArrayList<ParmInfo> runpgm() throws Exception  {
 		
 		parmsInfo = setUpParameters();
-		dbConn = new CdsAS400Connection(dbFile);
+		dbConn = new CdsAS400Connection(DB_PROPS_FILE);
 
 		AS400 serv = null;
 		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
@@ -177,7 +176,6 @@ public class PgmCallRowFixture extends RowFixture {
 	        				parmsInfo.get(i).setDataValue(charParm.trim());
 	        				linkparmOffset += numBytes;
 	        				break;
-//	    				
 	        			case NUM:
 	        				numBytes = parmsInfo.get(i).getByteLength();
 	        				thisparm = new byte[numBytes];	    					

@@ -10,22 +10,21 @@ import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.CommandCall;
-
+import static com.cds.fitnesse.utils.CdsFixtureUtils.*;
 import fitlibrary.SequenceFixture;
 
 public class CmdCallSequenceFixture extends SequenceFixture {
 
-	private static final String SERV = "SERV";
-	protected String applicationName = null;
-	protected Properties dbProperties = null;
+//	protected String applicationName = null;
+//	protected Properties dbProperties = null;
 	private CdsAS400Connection dbConn = null;
-	private String returnMsg = "";
-	private String dbFile = "db.properties";
+//	private String returnMsg = "";
 	private AS400 serv;
 
 	public String runcmd(String command) throws Exception  {
 
-		dbConn = new CdsAS400Connection(dbFile);
+		String returnMsg = "";
+		dbConn = new CdsAS400Connection(DB_PROPS_FILE);
 
 		AS400 serv = null;
 		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
@@ -61,7 +60,7 @@ public class CmdCallSequenceFixture extends SequenceFixture {
 			this.dbConn.setDataSource(dataSource);
 		}
 
-		dbConn = new CdsAS400Connection(dbFile);
+		dbConn = new CdsAS400Connection(DB_PROPS_FILE);
 		this.dbConn.setUser(userName);
 		this.dbConn.setPassword(password);		
 

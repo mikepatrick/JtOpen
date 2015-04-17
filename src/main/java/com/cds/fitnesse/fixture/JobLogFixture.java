@@ -31,16 +31,14 @@ import com.ibm.as400.access.SpooledFileList;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import fit.Fixture;
 import fit.RowFixture;
-
+import static com.cds.fitnesse.utils.CdsFixtureUtils.*;
 public class JobLogFixture extends RowFixture{
 
-	private static final String SERV = "SERV";
-	private String dbFile = "db.properties";
 	private SubmittedJob theJob;
 	
 	private ArrayList<SpooledFileListing> getSpooledJobLog() throws PropertyVetoException, AS400Exception, ConnectionDroppedException, AS400SecurityException, ErrorCompletingRequestException, InterruptedException, IOException, RequestNotSupportedException{
 		AS400 serv = null;
-		CdsAS400Connection dbConn = new CdsAS400Connection(dbFile);
+		CdsAS400Connection dbConn = new CdsAS400Connection(DB_PROPS_FILE);
 		String fullJobName = (String) Fixture.getSymbol("qualJobName");
 		
 		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
@@ -69,7 +67,7 @@ public class JobLogFixture extends RowFixture{
 						;
 					}
 					else
-					{
+					{	//TODO Use CollectionUtils or something here to deal with parameterized type
 						List<AS400Message> mlist = Arrays.asList(cpyCmd.getMessageList());
 						
 						for (AS400Message message: mlist)

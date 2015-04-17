@@ -1,7 +1,6 @@
 package com.cds.fitnesse.fixture;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -10,9 +9,8 @@ import com.cds.fitnesse.utils.CdsFixtureUtils;
 import com.cds.fitnesse.utils.CommandExecution;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Message;
-import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.CommandCall;
-
+import static com.cds.fitnesse.utils.CdsFixtureUtils.*;
 import fit.RowFixture;
 
 public class CmdCallFixture extends RowFixture {
@@ -21,22 +19,21 @@ public class CmdCallFixture extends RowFixture {
 	 * This fixture returns an ArrayList of CommandExecution objects.
 	 * 
 	 */
-	private static final String SERV = "SERV";
-	protected String applicationName = null;
-	protected Properties dbProperties = null;
+//	protected String applicationName = null;
+//	protected Properties dbProperties = null;
 	private CdsAS400Connection dbConn = null;
-	private String returnMsg = "";
-	private String dbFile = "db.properties";
+//	private String returnMsg = "";
 	
 	public ArrayList<CommandExecution> runcmd(String command) throws Exception  {
 
-		dbConn = new CdsAS400Connection(dbFile);
-		AS400 serv = null;
+		String returnMsg = "";
+		dbConn = new CdsAS400Connection(DB_PROPS_FILE);
 		ArrayList<CommandExecution> thisCall = new ArrayList<CommandExecution>();
 		thisCall.add(new CommandExecution());
 		thisCall.get(0).setCmd(command);
+	
 		
-		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());			
+		AS400 serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());			
 		CommandCall cmd = new CommandCall(serv, command);
 		 
 		try{
@@ -45,7 +42,6 @@ public class CmdCallFixture extends RowFixture {
 			}
 			
 			AS400Message[] messagelist = cmd.getMessageList();
-			returnMsg = "";
 			for (int i = 0; i < messagelist.length; ++i){
         
 				System.out.println(messagelist[i].getText());
@@ -78,7 +74,7 @@ public class CmdCallFixture extends RowFixture {
 		}
 		this.dbConn.setUser(userName);
 		this.dbConn.setPassword(password);
-		dbConn = new CdsAS400Connection(dbFile);
+		dbConn = new CdsAS400Connection(DB_PROPS_FILE);
 		AS400 serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		return "Credentials changed";
 	}

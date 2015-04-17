@@ -19,17 +19,13 @@ import com.ibm.as400.access.ProgramCall;
 import com.ibm.as400.access.ProgramParameter;
 
 import fitlibrary.SequenceFixture;
+import static com.cds.fitnesse.utils.CdsFixtureUtils.*;
 
 public class PgmCallFixture extends SequenceFixture {
  
-	private static final String SERV = "SERV";
-	private static final String CHAR = "CHAR";
-	private static final String NUM = "NUM";
-	private static final String ZON = "ZON";
-	protected Properties dbProperties = null;
+	//protected Properties dbProperties = null;
 	private CdsAS400Connection dbConn = null;
-	private String returnMsg = "";
-	private String dbFile = "db.properties";
+	//private String returnMsg = "";
 	
 	public String runpgm() throws Exception  {
 		if (args.length == 0){
@@ -80,8 +76,8 @@ public class PgmCallFixture extends SequenceFixture {
 				}
 			}
 		}
-		
-		dbConn = new CdsAS400Connection(dbFile);
+		String returnMsg = "";
+		dbConn = new CdsAS400Connection(DB_PROPS_FILE);
 
 		AS400 serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		
@@ -93,7 +89,6 @@ public class PgmCallFixture extends SequenceFixture {
 	        if (pgm.run() != true)
 	        {
 	            System.out.println("Program failed - pgm.run() did not return true");
-	            returnMsg = "";
 	            AS400Message[] messagelist = pgm.getMessageList();
 	            for (int i = 0; i < messagelist.length; ++i)
 	            {
