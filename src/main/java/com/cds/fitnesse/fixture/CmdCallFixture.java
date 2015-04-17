@@ -1,8 +1,10 @@
 package com.cds.fitnesse.fixture;
 
 
+import static com.cds.fitnesse.utils.CdsFixtureUtils.DB_PROPS_FILE;
+import static com.cds.fitnesse.utils.CdsFixtureUtils.SERV;
+
 import java.util.ArrayList;
-import java.util.Properties;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
 import com.cds.fitnesse.utils.CdsFixtureUtils;
@@ -10,7 +12,7 @@ import com.cds.fitnesse.utils.CommandExecution;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.CommandCall;
-import static com.cds.fitnesse.utils.CdsFixtureUtils.*;
+
 import fit.RowFixture;
 
 public class CmdCallFixture extends RowFixture {
@@ -19,10 +21,8 @@ public class CmdCallFixture extends RowFixture {
 	 * This fixture returns an ArrayList of CommandExecution objects.
 	 * 
 	 */
-//	protected String applicationName = null;
-//	protected Properties dbProperties = null;
+	
 	private CdsAS400Connection dbConn = null;
-//	private String returnMsg = "";
 	
 	public ArrayList<CommandExecution> runcmd(String command) throws Exception  {
 
@@ -37,16 +37,16 @@ public class CmdCallFixture extends RowFixture {
 		CommandCall cmd = new CommandCall(serv, command);
 		 
 		try{
-			if (cmd.run() != true){
+			if (cmd.run() != true) 
+			{
 				System.out.println("Command failed - cmd.run() did not return true");	
 			}
 			
 			AS400Message[] messagelist = cmd.getMessageList();
-			for (int i = 0; i < messagelist.length; ++i){
-        
+			for (int i = 0; i < messagelist.length; ++i)
+			{
 				System.out.println(messagelist[i].getText());
 				returnMsg = returnMsg.concat(messagelist[i].getText());
-//				thisCall.add(new CommandExecution("", messagelist[i].getText()));
 			}	 
 			thisCall.get(0).setReturnMsg(returnMsg);
 			thisCall.get(0).setCmd(command);

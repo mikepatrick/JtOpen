@@ -15,19 +15,13 @@ import fitlibrary.SequenceFixture;
 
 public class CmdCallSequenceFixture extends SequenceFixture {
 
-//	protected String applicationName = null;
-//	protected Properties dbProperties = null;
 	private CdsAS400Connection dbConn = null;
-//	private String returnMsg = "";
-	private AS400 serv;
 
 	public String runcmd(String command) throws Exception  {
 
 		String returnMsg = "";
 		dbConn = new CdsAS400Connection(DB_PROPS_FILE);
-
-		AS400 serv = null;
-		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
+		AS400 serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		
 		CommandCall cmd = new CommandCall(serv, command);
 
@@ -64,7 +58,7 @@ public class CmdCallSequenceFixture extends SequenceFixture {
 		this.dbConn.setUser(userName);
 		this.dbConn.setPassword(password);		
 
-		serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
+		AS400 serv = CdsFixtureUtils.getAS400(SERV, dbConn.getUser(), dbConn.getPassword());
 		
 		return "Credentials changed";
 	}

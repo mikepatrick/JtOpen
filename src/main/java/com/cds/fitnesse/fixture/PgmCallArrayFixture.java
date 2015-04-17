@@ -24,12 +24,8 @@ import static com.cds.fitnesse.utils.CdsFixtureUtils.*;
 
 public class PgmCallArrayFixture extends ArrayFixture {
  
-//	protected String applicationName = null;
-//	protected Properties dbProperties = null;
 	private static final String url = "jdbc:as400://serv.cdsfulfillment.com/;user=WWWAUTOT;password=cds999;transaction isolation=none;errors=full;";
-	//private static final String driverName = "com.ibm.as400.access.AS400JDBCDriver";
 	private CdsAS400Connection dbConn = null;
-	//private String returnMsg = "";
 	private ArrayList<parmInfo> parmsInfo = null;
 	private ProgramParameter[] parameterList = null;
 	private String qualifiedProgramName;
@@ -153,9 +149,8 @@ public class PgmCallArrayFixture extends ArrayFixture {
 	        return parmsInfo;
 	        
 	    }
-	    // Done with the system.
-	    // serv.disconnectAllServices();		
 	}
+	
 	private class parmInfo{
 		public String dataName;
 		public String dataType;
@@ -169,6 +164,7 @@ public class PgmCallArrayFixture extends ArrayFixture {
 			this.dataValue = dataValue;
 		}
 	}
+	
 	@Override
 	public Class<?> getTargetClass() {
 		return parmInfo.class;

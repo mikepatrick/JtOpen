@@ -1,10 +1,14 @@
 package com.cds.fitnesse.fixture;
 
 
-import java.io.IOException;
+import static com.cds.fitnesse.utils.CdsFixtureUtils.CHAR;
+import static com.cds.fitnesse.utils.CdsFixtureUtils.DB_PROPS_FILE;
+import static com.cds.fitnesse.utils.CdsFixtureUtils.NUM;
+import static com.cds.fitnesse.utils.CdsFixtureUtils.SERV;
+import static com.cds.fitnesse.utils.CdsFixtureUtils.ZON;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Properties;
 
 import com.cds.fitnesse.utils.CdsAS400Connection;
 import com.cds.fitnesse.utils.CdsFixtureUtils;
@@ -12,20 +16,16 @@ import com.cds.fitnesse.utils.ParmInfo;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.AS400PackedDecimal;
-import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.AS400Text;
 import com.ibm.as400.access.AS400ZonedDecimal;
 import com.ibm.as400.access.ProgramCall;
 import com.ibm.as400.access.ProgramParameter;
 
 import fitlibrary.SequenceFixture;
-import static com.cds.fitnesse.utils.CdsFixtureUtils.*;
 
 public class PgmCallFixture extends SequenceFixture {
  
-	//protected Properties dbProperties = null;
 	private CdsAS400Connection dbConn = null;
-	//private String returnMsg = "";
 	
 	public String runpgm() throws Exception  {
 		if (args.length == 0){
@@ -130,8 +130,6 @@ public class PgmCallFixture extends SequenceFixture {
 	        return "Program " + pgm.getProgram() + " issued an exception!";
 	        
 	    }
-	    // Done with the system.
-	    // serv.disconnectAllServices();		
 	}
 }
 

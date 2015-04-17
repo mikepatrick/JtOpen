@@ -22,9 +22,9 @@ public class DataQueueFixture extends SequenceFixture {
 	private DataQueue dq = null;
 	
 	private String getPath(String lib, String qName){
-//		returnVal = returnVal.concat("/QSYS.LIB/").concat(lib).concat(".LIB/").concat(qName).concat(".DTAQ");
 		return "".concat("/QSYS.LIB/").concat(lib).concat(".LIB/").concat(qName).concat(".DTAQ");
 	}
+	
 	public String create(String lib, String dtaq) {
 		
 		dbConn = new CdsAS400Connection(DB_PROPS_FILE);

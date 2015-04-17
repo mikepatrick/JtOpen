@@ -1,5 +1,8 @@
 package com.cds.fitnesse.fixture;
 
+import static com.cds.fitnesse.utils.CdsFixtureUtils.DB_PROPS_FILE;
+import static com.cds.fitnesse.utils.CdsFixtureUtils.SERV;
+
 import java.beans.PropertyVetoException;
 //import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,7 +34,6 @@ import com.ibm.as400.access.SpooledFileList;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import fit.Fixture;
 import fit.RowFixture;
-import static com.cds.fitnesse.utils.CdsFixtureUtils.*;
 public class JobLogFixture extends RowFixture{
 
 	private SubmittedJob theJob;

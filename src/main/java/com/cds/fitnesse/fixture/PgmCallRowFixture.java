@@ -34,8 +34,7 @@ public class PgmCallRowFixture extends RowFixture {
 			return this.dType;
 		}
 	}
-	//protected String applicationName = null;
-	//protected Properties dbProperties = null;
+	
 	private CdsAS400Connection dbConn = null;
 	private ArrayList<ParmInfo> parmsInfo = null;
 	private ProgramParameter[] parameterList = null;
