@@ -2,12 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/test/java"/>
-	<classpathentry kind="lib" path="D:/opt/eclipse/workspace/JtOpen/lib/fitlibrary-20081102.jar"/>
-	<classpathentry kind="lib" path="D:/opt/eclipse/workspace/JtOpen/lib/fitnesse-20111025.jar" sourcepath="C:/Users/mpatrick/Downloads/fitnesseWiki/FitNesseRoot"/>
-	<classpathentry kind="lib" path="lib/db.properties"/>
-	<classpathentry kind="lib" path="D:/opt/eclipse/workspace/JtOpen/lib/jtopen/jt400.jar"/>
 	<classpathentry kind="lib" path="lib/fitnesse.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/fitlibrary-20081102.jar"/>
+	<classpathentry kind="lib" path="lib/fitnesse-20111025.jar"/>
+	<classpathentry kind="lib" path="lib/jtopen/jt400.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

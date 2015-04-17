@@ -175,11 +175,14 @@ public class SbmJobFixture extends CmdCallFixture{
 	     		if (s.hasNext()){
 	     			fullJobName = s.next();	
 	     		}else{
+	     			s.close();
 	     			return "Could not parse job name - ".concat(fullMessage);
 	     		} 
 	     }else{
+	    	 s.close();
 	    	 return "Could not parse job name - ".concat(fullMessage);
 		 }
+	     s.close();
 	     return fullJobName;
 	}
 	@Override
